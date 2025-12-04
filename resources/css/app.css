@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Plynulé přechody pro navigaci - ale ne pro Livewire polling */
+*:not([wire\:poll]):not([wire\:poll] *) {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+/* Zabránit probliknutí při načítání */
+html {
+    visibility: visible;
+}
+
+/* Optimalizace pro Livewire navigaci */
+[wire\:navigate] {
+    transition: opacity 0.2s ease-in-out;
+}
+
+[wire\:navigate].wire-loading {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* Zabránit blikání při Livewire pollingu */
+[wire\:poll],
+[wire\:poll] * {
+    transition: none !important;
+}
+
+.mention {
+    @apply bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300 px-1 rounded;
+}
+
+/* Alpine.js cloak - skrýt obsah před inicializací */
+[x-cloak] {
+    display: none !important;
+}
+
