@@ -56,10 +56,6 @@ Po seed:
 - ✅ Tmavý/světlý režim
 - ✅ Autentizace (Laravel Breeze)
 
-## 📚 Dokumentace
-
-Viz `QUICK_START.md` nebo `INSTALLATION.md` pro detailní instrukce.
-
 ## 🛠️ Technologie
 
 - **Laravel 12** - PHP framework
