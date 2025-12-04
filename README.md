@@ -62,8 +62,9 @@ Viz `QUICK_START.md` nebo `INSTALLATION.md` pro detailní instrukce.
 
 ## 🛠️ Technologie
 
-- **Laravel 10** - PHP framework
-- **Livewire** - Interaktivní komponenty
+- **Laravel 12** - PHP framework
+- **Livewire 3** - Interaktivní komponenty
 - **Tailwind CSS** - Styling
 - **Alpine.js** - Frontend interaktivita
 - **MySQL/MariaDB** - Databáze
+- **PHP 8.2+** - Backend jazyk
