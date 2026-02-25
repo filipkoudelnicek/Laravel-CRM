@@ -18,13 +18,20 @@ class CrmSeeder extends Seeder
 {
     public function run(): void
     {
+        // Skip if already seeded
+        if (Client::exists()) {
+            return;
+        }
+
         // ── Users ──────────────────────────────────────────────────────────
-        $admin = User::factory()->create([
-            'name'     => 'Codencio Admin',
-            'email'    => 'info@codencio.cz',
-            'password' => bcrypt('Xk9m2vLp'),
-            'role'     => 'admin',
-        ]);
+        $admin = User::firstOrCreate(
+            ['email' => 'info@codencio.cz'],
+            [
+                'name'     => 'Codencio Admin',
+                'password' => bcrypt('Xk9m2vLp'),
+                'role'     => 'admin',
+            ]
+        );
 
         // Aliases kept for seeder references below
         $member1 = $admin;
