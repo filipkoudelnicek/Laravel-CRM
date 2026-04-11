@@ -39,7 +39,11 @@
                   <div class="d-flex px-2 py-1">
                     <div class="d-flex flex-column justify-content-center">
                       <h6 class="mb-0 text-sm">
-                        <a href="{{ route('clients.show', $client) }}" class="text-dark">{{ $client->name }}</a>
+                        <button onclick="openDetailModal('{{ route('clients.modal', $client) }}')" 
+                                class="btn btn-link text-dark p-0 text-decoration-none text-start"
+                                style="font-weight: 500;">
+                          {{ $client->name }}
+                        </button>
                       </h6>
                       @if($client->phone)<p class="text-xs text-secondary mb-0">{{ $client->phone }}</p>@endif
                     </div>
@@ -51,17 +55,25 @@
                   <span class="badge badge-sm bg-gradient-secondary">{{ $client->projects_count }}</span>
                 </td>
                 <td class="text-center">
-                  <a href="{{ route('clients.show', $client) }}" class="text-secondary font-weight-bold text-xs me-2">Zobrazit</a>
-                  @can('update', $client)
-                    <a href="{{ route('clients.edit', $client) }}" class="text-secondary font-weight-bold text-xs me-2">Upravit</a>
-                  @endcan
-                  @can('delete', $client)
-                    <form method="POST" action="{{ route('clients.destroy', $client) }}" class="d-inline"
-                          onsubmit="return confirm('Smazat tohoto klienta?')">
-                      @csrf @method('DELETE')
-                      <button class="btn btn-link text-danger font-weight-bold text-xs p-0 m-0">Smazat</button>
-                    </form>
-                  @endcan
+                  <div class="btn-group btn-group-sm" role="group">
+                    <a href="{{ route('clients.show', $client) }}" class="btn btn-outline-secondary" title="Otevřít">
+                      <i class="fas fa-external-link-alt fa-xs"></i>
+                    </a>
+                    @can('update', $client)
+                      <a href="{{ route('clients.edit', $client) }}" class="btn btn-outline-secondary" title="Upravit">
+                        <i class="fas fa-edit fa-xs"></i>
+                      </a>
+                    @endcan
+                    @can('delete', $client)
+                      <form method="POST" action="{{ route('clients.destroy', $client) }}" class="d-inline"
+                            onsubmit="return confirm('Smazat tohoto klienta?')">
+                        @csrf @method('DELETE')
+                        <button class="btn btn-outline-danger" title="Smazat" type="submit">
+                          <i class="fas fa-trash fa-xs"></i>
+                        </button>
+                      </form>
+                    @endcan
+                  </div>
                 </td>
               </tr>
               @empty
@@ -77,5 +89,7 @@
     </div>
   </div>
 </div>
+
+@include('components.detail-modal')
 @endsection
 

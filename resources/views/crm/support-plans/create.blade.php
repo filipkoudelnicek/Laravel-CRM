@@ -1,68 +1,58 @@
 @extends('layouts.user_type.auth')
 
 @section('content')
-<div class="row justify-content-center">
-  <div class="col-lg-8">
-    <div class="card mb-4">
-      <div class="card-header pb-0">
-        <h5 class="mb-0">Nový plán podpory</h5>
+<x-form-layout 
+  title="Nový plán podpory" 
+  submitText="Vytvořit"
+  backUrl="{{ route('support-plans.index') }}">
+  
+  <form method="POST" action="{{ route('support-plans.store') }}">
+    @csrf
+
+    <div class="row">
+      <div class="col-md-6">
+        <x-form-field name="client_id" label="Klient" type="select" required>
+          <option value="">— Vyberte klienta —</option>
+          @foreach($clients as $c)
+            <option value="{{ $c->id }}" @selected(old('client_id', $selectedClient?->id) == $c->id)>{{ $c->name }}</option>
+          @endforeach
+        </x-form-field>
       </div>
-      <div class="card-body">
-        @include('crm.partials.errors')
-        <form method="POST" action="{{ route('support-plans.store') }}">
-          @csrf
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label class="form-label">Klient <span class="text-danger">*</span></label>
-              <select name="client_id" class="form-select" required>
-                <option value="">— Vyberte klienta —</option>
-                @foreach($clients as $c)
-                  <option value="{{ $c->id }}" {{ old('client_id', $selectedClient?->id) == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
-                @endforeach
-              </select>
-            </div>
-            <div class="col-md-6 mb-3">
-              <label class="form-label">Název <span class="text-danger">*</span></label>
-              <input type="text" name="title" value="{{ old('title') }}" class="form-control" required placeholder="Např. Podpora webu">
-            </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Cena <span class="text-danger">*</span></label>
-              <input type="number" name="price" value="{{ old('price') }}" step="0.01" min="0" class="form-control" required>
-            </div>
-            <div class="col-md-2 mb-3">
-              <label class="form-label">Měna</label>
-              <input type="text" name="currency" value="{{ old('currency', 'CZK') }}" class="form-control" maxlength="3" required>
-            </div>
-            <div class="col-md-3 mb-3">
-              <label class="form-label">Stav</label>
-              <select name="status" class="form-select" required>
-                @php $spStatusLabels = ['active'=>'Aktivní','expired'=>'Vypršelo','cancelled'=>'Zrušeno']; @endphp
-                @foreach(\App\Models\SupportPlan::STATUSES as $s)
-                  <option value="{{ $s }}" {{ old('status', 'active') === $s ? 'selected' : '' }}>{{ $spStatusLabels[$s] ?? ucfirst($s) }}</option>
-                @endforeach
-              </select>
-            </div>
-            <div class="col-md-3 mb-3">
-              <label class="form-label">Od <span class="text-danger">*</span></label>
-              <input type="date" name="period_from" value="{{ old('period_from', now()->format('Y-m-d')) }}" class="form-control" required>
-            </div>
-            <div class="col-md-3 mb-3">
-              <label class="form-label">Do <span class="text-danger">*</span></label>
-              <input type="date" name="period_to" value="{{ old('period_to', now()->addYear()->format('Y-m-d')) }}" class="form-control" required>
-            </div>
-            <div class="col-12 mb-3">
-              <label class="form-label">Poznámky</label>
-              <textarea name="notes" rows="3" class="form-control">{{ old('notes') }}</textarea>
-            </div>
-          </div>
-          <div class="d-flex justify-content-end gap-2">
-            <a href="{{ route('support-plans.index') }}" class="btn btn-outline-secondary btn-sm">Zrušit</a>
-            <button type="submit" class="btn bg-gradient-primary btn-sm">Vytvořit</button>
-          </div>
-        </form>
+      <div class="col-md-6">
+        <x-form-field name="title" label="Název" value="{{ old('title') }}" required placeholder="Např. Podpora webu" />
       </div>
     </div>
-  </div>
-</div>
+
+    <div class="row">
+      <div class="col-md-4">
+        <x-form-field name="price" label="Cena" type="number" step="0.01" min="0" value="{{ old('price') }}" required />
+      </div>
+      <div class="col-md-2">
+        <x-form-field name="currency" label="Měna" value="{{ old('currency', 'CZK') }}" maxlength="3" required />
+      </div>
+      <div class="col-md-3">
+        <x-form-field name="status" label="Stav" type="select" required>
+          @php $spStatusLabels = ['active'=>'Aktivní','expired'=>'Vypršelo','cancelled'=>'Zrušeno']; @endphp
+          @foreach(\App\Models\SupportPlan::STATUSES as $s)
+            <option value="{{ $s }}" @selected(old('status', 'active') === $s)>{{ $spStatusLabels[$s] ?? ucfirst($s) }}</option>
+          @endforeach
+        </x-form-field>
+      </div>
+      <div class="col-md-3">
+        <x-form-field name="period_from" label="Od" type="date" value="{{ old('period_from', now()->format('Y-m-d')) }}" required />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-3">
+        <x-form-field name="period_to" label="Do" type="date" value="{{ old('period_to', now()->addYear()->format('Y-m-d')) }}" required />
+      </div>
+    </div>
+
+    <x-form-field name="notes" label="Poznámky" type="textarea" rows="3" value="{{ old('notes') }}" />
+
+    <x-form-actions submitText="Vytvořit" backUrl="{{ route('support-plans.index') }}" />
+  </form>
+</x-form-layout>
 @endsection
 

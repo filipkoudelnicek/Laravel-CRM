@@ -12,9 +12,9 @@
                             <h5 class="mb-0">Uživatelé</h5>
                         </div>
                         @if(auth()->user()->isAdmin())
-                        <a href="{{ route('users.create') }}" class="btn bg-gradient-primary btn-sm mb-0">
+                        <button class="btn bg-gradient-primary btn-sm mb-0" data-bs-toggle="modal" data-bs-target="#addUserModal">
                             <i class="fas fa-plus me-1"></i> Nový uživatel
-                        </a>
+                        </button>
                         @endif
                     </div>
                 </div>
@@ -109,4 +109,133 @@
     </div>
 </div>
 
+{{-- Modal pro přidání nového uživatele --}}
+<div class="modal fade" id="addUserModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Nový uživatel</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form id="addUserForm" method="POST" action="{{ route('users.store') }}">
+        @csrf
+        <div class="modal-body">
+          <div id="formErrors" class="alert alert-danger d-none" role="alert"></div>
+          <div id="formSuccess" class="alert alert-success d-none" role="alert">Uživatel byl vytvořen!</div>
+
+          <div class="mb-3">
+            <label class="form-label">Jméno <span class="text-danger">*</span></label>
+            <input type="text" name="name" class="form-control" required>
+            <small class="text-danger d-none" data-error="name"></small>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">E-mail <span class="text-danger">*</span></label>
+            <input type="email" name="email" class="form-control" required>
+            <small class="text-danger d-none" data-error="email"></small>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Heslo <span class="text-danger">*</span></label>
+            <input type="password" name="password" class="form-control" required minlength="8">
+            <small class="text-danger d-none" data-error="password"></small>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Potvrzení hesla <span class="text-danger">*</span></label>
+            <input type="password" name="password_confirmation" class="form-control" required minlength="8">
+            <small class="text-danger d-none" data-error="password_confirmation"></small>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Role <span class="text-danger">*</span></label>
+            <select name="role" class="form-select" required>
+              <option value="">— Vyberte roli —</option>
+              <option value="member">Člen</option>
+              <option value="manager">Manažer</option>
+              <option value="admin">Administrátor</option>
+            </select>
+            <small class="text-danger d-none" data-error="role"></small>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Telefon</label>
+            <input type="text" name="phone" class="form-control">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Lokace</label>
+            <input type="text" name="location" class="form-control">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Zrušit</button>
+          <button type="submit" class="btn bg-gradient-primary btn-sm">
+            <i class="fas fa-save me-1"></i> Vytvořit uživatele
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+@push('scripts')
+<script>
+document.getElementById('addUserForm')?.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const formData = new FormData(this);
+  const errorsDiv = document.getElementById('formErrors');
+  const successDiv = document.getElementById('formSuccess');
+  
+  try {
+    const response = await fetch(this.action, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+      }
+    });
+    
+    if (response.ok) {
+      successDiv.classList.remove('d-none');
+      this.reset();
+      errorsDiv.classList.add('d-none');
+      
+      // Reload page after 1.5 seconds
+      setTimeout(() => location.reload(), 1500);
+    } else {
+      const errors = await response.json();
+      if (errors.errors) {
+        let errorHtml = '<strong>Kontrolujte formulář:</strong><ul class="mb-0 mt-2">';
+        Object.keys(errors.errors).forEach(field => {
+          const fieldError = document.querySelector(`[data-error="${field}"]`);
+          if (fieldError) {
+            fieldError.textContent = errors.errors[field][0];
+            fieldError.classList.remove('d-none');
+          }
+          errorHtml += `<li>${errors.errors[field][0]}</li>`;
+        });
+        errorHtml += '</ul>';
+        errorsDiv.innerHTML = errorHtml;
+        errorsDiv.classList.remove('d-none');
+      }
+      successDiv.classList.add('d-none');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    errorsDiv.textContent = 'Došlo k chybě při vytváření uživatele.';
+    errorsDiv.classList.remove('d-none');
+  }
+});
+
+// Reset form when modal is hidden
+document.getElementById('addUserModal')?.addEventListener('hidden.bs.modal', function() {
+  document.getElementById('addUserForm').reset();
+  document.getElementById('formErrors').classList.add('d-none');
+  document.getElementById('formSuccess').classList.add('d-none');
+  document.querySelectorAll('[data-error]').forEach(el => el.classList.add('d-none'));
+});
+</script>
+@endpush
 @endsection

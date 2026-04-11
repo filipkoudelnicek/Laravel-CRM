@@ -12,6 +12,11 @@
       </div>
       <div class="card-body pt-2">
         <ul class="list-group list-group-flush">
+          <li class="list-group-item ps-0 border-0">
+            <small class="text-secondary">Typ</small><br>
+            <span class="badge bg-gradient-light text-dark text-sm">{{ \App\Models\PasswordEntry::TYPES[$password->type] ?? $password->type }}</span>
+          </li>
+
           @if($password->username)
           <li class="list-group-item ps-0 border-0">
             <small class="text-secondary">Uživ. jméno</small><br>
@@ -40,6 +45,35 @@
             <small class="text-secondary">URL</small><br>
             <a href="{{ $password->url }}" target="_blank" rel="noopener" class="text-sm">{{ $password->url }}</a>
           </li>
+          @endif
+
+          {{-- Type-specific fields --}}
+          @if($password->type === 'sftp')
+            @if($password->sftp_host)
+            <li class="list-group-item ps-0 border-0">
+              <small class="text-secondary">SFTP Host</small><br>
+              <span class="text-sm font-monospace">{{ $password->sftp_host }}:{{ $password->sftp_port ?? 22 }}</span>
+            </li>
+            @endif
+            @if($password->sftp_path)
+            <li class="list-group-item ps-0 border-0">
+              <small class="text-secondary">Cesta</small><br>
+              <span class="text-sm font-monospace">{{ $password->sftp_path }}</span>
+            </li>
+            @endif
+          @elseif($password->type === 'hosting')
+            @if($password->hosting_provider)
+            <li class="list-group-item ps-0 border-0">
+              <small class="text-secondary">Poskytovatel</small><br>
+              <span class="text-sm">{{ $password->hosting_provider }}</span>
+            </li>
+            @endif
+            @if($password->ftp_host)
+            <li class="list-group-item ps-0 border-0">
+              <small class="text-secondary">FTP Host</small><br>
+              <span class="text-sm font-monospace">{{ $password->ftp_host }}</span>
+            </li>
+            @endif
           @endif
 
           @if($password->client)

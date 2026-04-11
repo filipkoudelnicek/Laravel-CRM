@@ -143,4 +143,15 @@ class ProjectController extends Controller
         $project->users()->detach($user->id);
         return back()->with('success', 'Člen odebrán.');
     }
+
+    /**
+     * Get modal HTML for AJAX requests
+     */
+    public function modalView(Project $project)
+    {
+        $this->authorize('view', $project);
+        $project->load(['client', 'users', 'tasks']);
+        $project->loadCount('tasks');
+        return view('crm.projects._modal_content', compact('project'));
+    }
 }

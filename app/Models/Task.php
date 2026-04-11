@@ -48,4 +48,9 @@ class Task extends Model
     {
         return $this->hasMany(Comment::class);
     }
+
+    public function timeEntries(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(TimeEntry::class)->orderByDesc('started_at');
+    }
 }

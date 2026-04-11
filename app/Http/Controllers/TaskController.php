@@ -180,4 +180,14 @@ class TaskController extends Controller
         $task->delete();
         return redirect()->route('tasks.index')->with('success', 'Úkol smazán.');
     }
+
+    /**
+     * Get modal HTML for AJAX requests
+     */
+    public function modalView(Task $task)
+    {
+        $this->authorize('view', $task);
+        $task->load(['project.client', 'assignees']);
+        return view('crm.tasks._modal_content', compact('task'));
+    }
 }

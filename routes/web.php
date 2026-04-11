@@ -16,6 +16,7 @@ use App\Http\Controllers\SessionsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SupportPlanController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\TimeEntryController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => 'auth'], function () {
@@ -42,14 +43,22 @@ Route::group(['middleware' => 'auth'], function () {
 
     // Clients
     Route::resource('clients', ClientController::class);
+    Route::get('clients/{client}/modal', [ClientController::class, 'modalView'])->name('clients.modal');
 
     // Projects
     Route::resource('projects', ProjectController::class);
     Route::post('projects/{project}/users',           [ProjectController::class, 'attachUser'])->name('projects.attach-user');
     Route::delete('projects/{project}/users/{user}',  [ProjectController::class, 'detachUser'])->name('projects.detach-user');
+    Route::get('projects/{project}/modal',            [ProjectController::class, 'modalView'])->name('projects.modal');
 
     // Tasks
+    Route::get('tasks/{task}/modal',                       [TaskController::class, 'modalView'])->name('tasks.modal');
     Route::resource('tasks', TaskController::class);
+
+    // Time Entries (scoped to task)
+    Route::post('tasks/{task}/time-entries',        [TimeEntryController::class, 'store'])->name('tasks.time-entries.store');
+    Route::put('tasks/{task}/time-entries/{timeEntry}', [TimeEntryController::class, 'update'])->name('tasks.time-entries.update');
+    Route::delete('tasks/{task}/time-entries/{timeEntry}', [TimeEntryController::class, 'destroy'])->name('tasks.time-entries.destroy');
 
     // Comments (scoped to task)
     Route::post('tasks/{task}/comments',        [CommentController::class, 'store'])->name('tasks.comments.store');

@@ -10,9 +10,16 @@ class PasswordEntry extends Model
 {
     use HasFactory;
 
+    public const TYPES = [
+        'general' => 'Obecné heslo',
+        'sftp' => 'SFTP',
+        'admin' => 'Administrace',
+        'hosting' => 'Hosting',
+    ];
+
     protected $fillable = [
         'title', 'username', 'password_encrypted', 'url', 'notes',
-        'client_id', 'project_id', 'created_by',
+        'type', 'client_id', 'project_id', 'created_by',
     ];
 
     // Never expose the encrypted value accidentally

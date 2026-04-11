@@ -53,7 +53,11 @@
                   <div class="d-flex px-2 py-1">
                     <div class="d-flex flex-column justify-content-center">
                       <h6 class="mb-0 text-sm">
-                        <a href="{{ route('projects.show', $project) }}" class="text-dark">{{ $project->name }}</a>
+                        <button onclick="openDetailModal('{{ route('projects.modal', $project) }}')" 
+                                class="btn btn-link text-dark p-0 text-decoration-none text-start"
+                                style="font-weight: 500;">
+                          {{ $project->name }}
+                        </button>
                       </h6>
                     </div>
                   </div>
@@ -73,22 +77,32 @@
                 <td class="text-center"><span class="text-xs">{{ $project->tasks_count }}</span></td>
                 <td class="text-center"><span class="text-xs">{{ $project->due_date?->format('d.m.Y') ?? '—' }}</span></td>
                 <td class="text-center">
-                  <a href="{{ route('projects.show', $project) }}" class="text-secondary font-weight-bold text-xs me-2">Zobrazit</a>
-                  @can('update', $project)
-                    <a href="{{ route('projects.edit', $project) }}" class="text-secondary font-weight-bold text-xs me-2">Upravit</a>
-                  @endcan
-                  @can('delete', $project)
-                    <form method="POST" action="{{ route('projects.destroy', $project) }}" class="d-inline"
-                          onsubmit="return confirm('Smazat tento projekt a všechny jeho úkoly?')">
-                      @csrf @method('DELETE')
-                      <button class="btn btn-link text-danger font-weight-bold text-xs p-0 mb-0">Smazat</button>
-                    </form>
-                  @endcan
+                  <div class="btn-group btn-group-sm" role="group">
+                    <a href="{{ route('projects.show', $project) }}" class="btn btn-outline-secondary" title="Otevřít">
+                      <i class="fas fa-external-link-alt fa-xs"></i>
+                    </a>
+                    @can('update', $project)
+                      <a href="{{ route('projects.edit', $project) }}" class="btn btn-outline-secondary" title="Upravit">
+                        <i class="fas fa-edit fa-xs"></i>
+                      </a>
+                    @endcan
+                    @can('delete', $project)
+                      <form method="POST" action="{{ route('projects.destroy', $project) }}" class="d-inline"
+                            onsubmit="return confirm('Smazat tento projekt a všechny jeho úkoly?')">
+                        @csrf @method('DELETE')
+                        <button class="btn btn-outline-danger" title="Smazat" type="submit">
+                          <i class="fas fa-trash fa-xs"></i>
+                        </button>
+                      </form>
+                    @endcan
+                  </div>
                 </td>
               </tr>
               @empty
               <tr><td colspan="6" class="text-center py-3 text-sm text-secondary">Žádné projekty nenalezeny.</td></tr>
               @endforelse
+
+@include('components.detail-modal')
             </tbody>
           </table>
         </div>

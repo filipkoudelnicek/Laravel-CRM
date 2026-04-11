@@ -35,19 +35,28 @@ class PasswordEntryController extends Controller
     {
         $clients  = Client::orderBy('name')->get();
         $projects = Project::orderBy('name')->get();
-        return view('crm.passwords.create', compact('clients', 'projects'));
+        $types    = \App\Models\PasswordEntry::TYPES;
+        return view('crm.passwords.create', compact('clients', 'projects', 'types'));
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
             'title'      => 'required|string|max:255',
+            'type'       => 'required|in:general,sftp,admin,hosting',
             'username'   => 'nullable|string|max:255',
             'password'   => 'required|string|max:1000',
             'url'        => 'nullable|url|max:500',
             'notes'      => 'nullable|string|max:2000',
             'client_id'  => 'nullable|exists:clients,id',
             'project_id' => 'nullable|exists:projects,id',
+            // SFTP fields
+            'sftp_host'  => 'nullable|string|max:255',
+            'sftp_port'  => 'nullable|numeric|min:1|max:65535',
+            'sftp_path'  => 'nullable|string|max:500',
+            // Hosting fields
+            'hosting_provider' => 'nullable|string|max:255',
+            'ftp_host'   => 'nullable|string|max:255',
         ]);
 
         $plain = $data['password'];
@@ -72,7 +81,8 @@ class PasswordEntryController extends Controller
     {
         $this->authorize('update', $password);
         $clients  = Client::orderBy('name')->get();
-        $projects = Project::orderBy('name')->get();
+        $types    = \App\Models\PasswordEntry::TYPES;
+        return view('crm.passwords.edit', compact('password', 'clients', 'projects', 'type
         return view('crm.passwords.edit', compact('password', 'clients', 'projects'));
     }
 
@@ -82,12 +92,20 @@ class PasswordEntryController extends Controller
 
         $data = $request->validate([
             'title'      => 'required|string|max:255',
+            'type'       => 'required|in:general,sftp,admin,hosting',
             'username'   => 'nullable|string|max:255',
             'password'   => 'nullable|string|max:1000',
             'url'        => 'nullable|url|max:500',
             'notes'      => 'nullable|string|max:2000',
             'client_id'  => 'nullable|exists:clients,id',
             'project_id' => 'nullable|exists:projects,id',
+            // SFTP fields
+            'sftp_host'  => 'nullable|string|max:255',
+            'sftp_port'  => 'nullable|numeric|min:1|max:65535',
+            'sftp_path'  => 'nullable|string|max:500',
+            // Hosting fields
+            'hosting_provider' => 'nullable|string|max:255',
+            'ftp_host'   => 'nullable|string|max:255',
         ]);
 
         if (!empty($data['password'])) {

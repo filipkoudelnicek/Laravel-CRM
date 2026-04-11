@@ -59,7 +59,11 @@
                   <div class="d-flex px-2 py-1">
                     <div class="d-flex flex-column justify-content-center">
                       <h6 class="mb-0 text-sm">
-                        <a href="{{ route('tasks.show', $task) }}" class="text-dark">{{ $task->title }}</a>
+                        <button onclick="openDetailModal('{{ route('tasks.modal', $task) }}')" 
+                                class="btn btn-link text-dark p-0 text-decoration-none text-start"
+                                style="font-weight: 500;">
+                          {{ $task->title }}
+                        </button>
                       </h6>
                     </div>
                   </div>
@@ -80,17 +84,25 @@
                 </td>
                 <td class="text-center"><span class="text-xs">{{ $task->due_date?->format('d.m.Y') ?? '—' }}</span></td>
                 <td class="text-center">
-                  <a href="{{ route('tasks.show', $task) }}" class="text-secondary font-weight-bold text-xs me-2">Zobrazit</a>
-                  @can('update', $task)
-                    <a href="{{ route('tasks.edit', $task) }}" class="text-secondary font-weight-bold text-xs me-2">Upravit</a>
-                  @endcan
-                  @can('delete', $task)
-                    <form method="POST" action="{{ route('tasks.destroy', $task) }}" class="d-inline"
-                          onsubmit="return confirm('Smazat tento úkol?')">
-                      @csrf @method('DELETE')
-                      <button class="btn btn-link text-danger font-weight-bold text-xs p-0 mb-0">Smazat</button>
-                    </form>
-                  @endcan
+                  <div class="btn-group btn-group-sm" role="group">
+                    <a href="{{ route('tasks.show', $task) }}" class="btn btn-outline-secondary" title="Otevřít">
+                      <i class="fas fa-external-link-alt fa-xs"></i>
+                    </a>
+                    @can('update', $task)
+                      <a href="{{ route('tasks.edit', $task) }}" class="btn btn-outline-secondary" title="Upravit">
+                        <i class="fas fa-edit fa-xs"></i>
+                      </a>
+                    @endcan
+                    @can('delete', $task)
+                      <form method="POST" action="{{ route('tasks.destroy', $task) }}" class="d-inline"
+                            onsubmit="return confirm('Smazat tento úkol?')">
+                        @csrf @method('DELETE')
+                        <button class="btn btn-outline-danger" title="Smazat" type="submit">
+                          <i class="fas fa-trash fa-xs"></i>
+                        </button>
+                      </form>
+                    @endcan
+                  </div>
                 </td>
               </tr>
               @empty
@@ -104,5 +116,7 @@
     </div>
   </div>
 </div>
+
+@include('components.detail-modal')
 @endsection
 

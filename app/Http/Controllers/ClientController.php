@@ -93,4 +93,15 @@ class ClientController extends Controller
         $client->delete();
         return redirect()->route('clients.index')->with('success', 'Klient smazán.');
     }
+
+    /**
+     * Get modal HTML for AJAX requests
+     */
+    public function modalView(Client $client)
+    {
+        $this->authorize('view', $client);
+        $client->load('projects');
+        $client->loadCount('projects');
+        return view('crm.clients._modal_content', compact('client'));
+    }
 }

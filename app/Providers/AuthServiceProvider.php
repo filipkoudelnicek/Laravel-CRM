@@ -9,6 +9,7 @@ use App\Models\PasswordEntry;
 use App\Models\Project;
 use App\Models\SupportPlan;
 use App\Models\Task;
+use App\Models\TimeEntry;
 use App\Policies\ClientPolicy;
 use App\Policies\CommentPolicy;
 use App\Policies\InvoicePolicy;
@@ -16,6 +17,7 @@ use App\Policies\PasswordEntryPolicy;
 use App\Policies\ProjectPolicy;
 use App\Policies\SupportPlanPolicy;
 use App\Policies\TaskPolicy;
+use App\Policies\TimeEntryPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
@@ -27,6 +29,7 @@ class AuthServiceProvider extends ServiceProvider
         Task::class          => TaskPolicy::class,
         Comment::class       => CommentPolicy::class,
         PasswordEntry::class => PasswordEntryPolicy::class,
+        TimeEntry::class     => TimeEntryPolicy::class,
         Invoice::class       => InvoicePolicy::class,
         SupportPlan::class   => SupportPlanPolicy::class,
     ];
