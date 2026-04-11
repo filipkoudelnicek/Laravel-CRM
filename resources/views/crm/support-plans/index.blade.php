@@ -3,6 +3,7 @@
 @section('content')
 <div class="row">
   <div class="col-12">
+    {{-- Summary cards --}}
     <div class="row mb-4">
       <div class="col-xl-4 col-sm-6 mb-xl-0 mb-4">
         <div class="card">
@@ -44,44 +45,55 @@
       </div>
     </div>
 
-    <div class="card mb-4 mx-0">
-      <div class="card-header pb-0">
-        <div class="d-flex justify-content-between align-items-center">
-          <h5 class="mb-0">Podpora / Předplatné</h5>
+    <div class="card mb-4">
+      <div class="card-header pb-3 pt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">
+            <i class="fas fa-shield-alt me-2 text-primary opacity-75"></i>Podpora / Předplatné
+          </h5>
           @can('create', \App\Models\SupportPlan::class)
-            <a href="{{ route('support-plans.create') }}" class="btn bg-gradient-primary btn-sm">+ Nová podpora</a>
+            <a href="{{ route('support-plans.create') }}" class="btn bg-gradient-primary btn-sm">
+              <i class="fas fa-plus me-1"></i> Nová podpora
+            </a>
           @endcan
         </div>
-        <div class="d-flex gap-2 mt-3 mb-0 flex-wrap">
-          <form method="GET" action="{{ route('support-plans.index') }}" class="d-flex gap-2">
-            <div class="input-group input-group-sm" style="max-width:260px">
-              <input type="text" name="q" value="{{ request('q') }}" class="form-control" placeholder="Název / klient">
-              <button class="btn btn-outline-secondary mb-0" type="submit">Hledat</button>
-            </div>
-            <select name="status" class="form-select form-select-sm" style="max-width:150px" onchange="this.form.submit()">
-              <option value="">Všechny stavy</option>
+        
+        {{-- Filters --}}
+        <form method="GET" action="{{ route('support-plans.index') }}" class="row g-2">
+          <div class="col-auto flex-grow-1" style="max-width: 300px;">
+            <input type="text" name="q" value="{{ request('q') }}" 
+                   class="form-control form-control-sm" placeholder="Název / klient…">
+          </div>
+          <div class="col-auto">
+            <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+              <option value="">— Všechny stavy —</option>
               @php $spStatusLabels = ['active'=>'Aktivní','expired'=>'Vypršelo','cancelled'=>'Zrušeno']; @endphp
               @foreach(\App\Models\SupportPlan::STATUSES as $s)
-                <option value="{{ $s }}" {{ request('status') === $s ? 'selected' : '' }}>{{ $spStatusLabels[$s] ?? ucfirst($s) }}</option>
+                <option value="{{ $s }}" @selected(request('status') === $s)>{{ $spStatusLabels[$s] ?? ucfirst($s) }}</option>
               @endforeach
             </select>
-            @if(request('q') || request('status'))
-              <a href="{{ route('support-plans.index') }}" class="btn btn-outline-secondary btn-sm">×</a>
-            @endif
-          </form>
-        </div>
+          </div>
+          @if(request('q') || request('status'))
+            <div class="col-auto">
+              <a href="{{ route('support-plans.index') }}" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-times me-1"></i> Vymazat
+              </a>
+            </div>
+          @endif
+        </form>
       </div>
-      <div class="card-body px-0 pt-0 pb-2">
-        <div class="table-responsive p-0">
-          <table class="table align-items-center mb-0">
-            <thead>
+      
+      <div class="card-body px-0 py-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light border-bottom">
               <tr>
-                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Název</th>
-                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Klient</th>
-                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Stav</th>
-                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Cena</th>
-                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Období</th>
-                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Akce</th>
+                <th class="text-xs fw-bold text-secondary px-4 py-3">Název</th>
+                <th class="text-xs fw-bold text-secondary px-4 py-3">Klient</th>
+                <th class="text-xs fw-bold text-secondary text-center px-4 py-3">Stav</th>
+                <th class="text-xs fw-bold text-secondary text-center px-4 py-3">Cena</th>
+                <th class="text-xs fw-bold text-secondary text-center px-4 py-3">Období</th>
+                <th class="text-xs fw-bold text-secondary text-center px-4 py-3" style="width: 100px;">Akce</th>
               </tr>
             </thead>
             <tbody>
@@ -90,50 +102,74 @@
                 $statusColors = ['active'=>'success','expired'=>'secondary','cancelled'=>'dark'];
                 $isExpiring = $plan->isExpiringSoon();
               @endphp
-              <tr>
-                <td>
-                  <div class="d-flex px-2 py-1">
-                    <div class="d-flex flex-column justify-content-center">
-                      <h6 class="mb-0 text-sm">
-                        <a href="{{ route('support-plans.show', $plan) }}" class="text-dark">{{ $plan->title }}</a>
-                      </h6>
-                    </div>
-                  </div>
+              <tr class="align-middle">
+                <td class="px-4 py-3">
+                  <a href="{{ route('support-plans.show', $plan) }}" class="text-dark fw-500 text-decoration-none">
+                    {{ $plan->title }}
+                  </a>
                 </td>
-                <td><p class="text-xs font-weight-bold mb-0">{{ $plan->client->name }}</p></td>
-                <td class="text-center">
-                  <span class="badge badge-sm bg-gradient-{{ $statusColors[$plan->status] ?? 'secondary' }}">
-                    @php $spStatusLabels = ['active'=>'Aktivní','expired'=>'Vypršelo','cancelled'=>'Zrušeno']; @endphp
+                <td class="px-4 py-3">
+                  <small class="text-secondary">{{ $plan->client->name }}</small>
+                </td>
+                <td class="px-4 py-3 text-center">
+                  <span class="badge bg-gradient-{{ $statusColors[$plan->status] ?? 'secondary' }} px-3">
+                    <i class="fas fa-shield-alt fa-xs me-1 opacity-75"></i>
                     {{ $spStatusLabels[$plan->status] ?? $plan->status }}
-                    @if($isExpiring) <i class="fas fa-exclamation-circle ms-1"></i> @endif
+                    @if($isExpiring)
+                      <i class="fas fa-exclamation-circle ms-1 fa-xs"></i>
+                    @endif
                   </span>
                 </td>
-                <td class="text-center">
-                  <span class="text-sm font-weight-bold">{{ number_format($plan->price, 0, ',', ' ') }} {{ $plan->currency }}</span>
+                <td class="px-4 py-3 text-center">
+                  <small class="fw-500">{{ number_format($plan->price, 0, ',', ' ') }} {{ $plan->currency }}</small>
                 </td>
-                <td class="text-center">
-                  <span class="text-xs">{{ $plan->period_from->format('d.m.Y') }} – {{ $plan->period_to->format('d.m.Y') }}</span>
+                <td class="px-4 py-3 text-center">
+                  <small class="text-secondary">
+                    <i class="fas fa-calendar fa-xs me-1 opacity-75"></i>
+                    {{ $plan->period_from->format('d.m.Y') }} – {{ $plan->period_to->format('d.m.Y') }}
+                  </small>
                 </td>
-                <td class="text-center">
-                  <a href="{{ route('support-plans.show', $plan) }}" class="text-secondary font-weight-bold text-xs me-2">Detail</a>
-                  @can('update', $plan)
-                    <a href="{{ route('support-plans.edit', $plan) }}" class="text-secondary font-weight-bold text-xs me-2">Upravit</a>
-                  @endcan
-                  @can('delete', $plan)
-                    <form method="POST" action="{{ route('support-plans.destroy', $plan) }}" class="d-inline" onsubmit="return confirm('Smazat podporu?')">
-                      @csrf @method('DELETE')
-                      <button class="btn btn-link text-danger font-weight-bold text-xs p-0 m-0">Smazat</button>
-                    </form>
-                  @endcan
+                <td class="px-4 py-3 text-center">
+                  <div class="btn-group btn-group-sm" role="group">
+                    <a href="{{ route('support-plans.show', $plan) }}" class="btn btn-outline-secondary btn-sm" title="Detail">
+                      <i class="fas fa-eye fa-sm"></i>
+                    </a>
+                    @can('update', $plan)
+                      <a href="{{ route('support-plans.edit', $plan) }}" class="btn btn-outline-secondary btn-sm" title="Upravit">
+                        <i class="fas fa-edit fa-sm"></i>
+                      </a>
+                    @endcan
+                    @can('delete', $plan)
+                      <form method="POST" action="{{ route('support-plans.destroy', $plan) }}" class="d-inline"
+                            onsubmit="return confirm('Smazat podporu?')">
+                        @csrf @method('DELETE')
+                        <button class="btn btn-outline-danger btn-sm" title="Smazat" type="submit">
+                          <i class="fas fa-trash fa-sm"></i>
+                        </button>
+                      </form>
+                    @endcan
+                  </div>
                 </td>
               </tr>
               @empty
-              <tr><td colspan="6" class="text-center py-3 text-sm text-secondary">Žádné plány podpory.</td></tr>
+              <tr>
+                <td colspan="6" class="px-4 py-4">
+                  <div class="text-center text-secondary">
+                    <i class="fas fa-inbox fa-3x opacity-25 d-block mb-2"></i>
+                    <small>Žádné plány podpory.</small>
+                  </div>
+                </td>
+              </tr>
               @endforelse
             </tbody>
           </table>
         </div>
-        <div class="px-4 pt-3">{{ $plans->links() }}</div>
+        
+        @if($plans->hasPages())
+          <div class="card-footer bg-white px-4 py-3 border-top">
+            {{ $plans->links() }}
+          </div>
+        @endif
       </div>
     </div>
   </div>
