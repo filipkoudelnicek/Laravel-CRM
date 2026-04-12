@@ -6,88 +6,112 @@
   $pc = ['low'=>'info','medium'=>'warning','high'=>'danger'];
 @endphp
 
+{{-- Header --}}
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="d-flex justify-content-between align-items-start">
+      <div>
+        <h3 class="mb-1">
+          <i class="fas fa-tasks me-2 text-primary opacity-75"></i>{{ $task->title }}
+        </h3>
+        @if($task->description)
+          <p class="text-secondary mb-0">{{ $task->description }}</p>
+        @endif
+      </div>
+      <div class="btn-group btn-group-sm" role="group">
+        @can('update', $task)
+          <a href="{{ route('tasks.edit', $task) }}" class="btn btn-outline-secondary">
+            <i class="fas fa-edit me-1"></i> Upravit
+          </a>
+        @endcan
+        @can('delete', $task)
+          <form method="POST" action="{{ route('tasks.destroy', $task) }}" class="d-inline" onsubmit="return confirm('Smazat úkol?')">
+            @csrf @method('DELETE')
+            <button class="btn btn-outline-danger">
+              <i class="fas fa-trash me-1"></i> Smazat
+            </button>
+          </form>
+        @endcan
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="row">
   {{-- Task details --}}
   <div class="col-lg-4">
+    {{-- Info card --}}
     <div class="card mb-4">
-      <div class="card-header pb-0 d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Úkol</h5>
-        <div class="btn-group btn-group-sm" role="group">
-          @can('update', $task)
-            <a href="{{ route('tasks.edit', $task) }}" class="btn btn-outline-secondary" title="Upravit">
-              <i class="fas fa-edit"></i>
-            </a>
-          @endcan
-        </div>
-      </div>
-      <div class="card-body pt-2">
-        <h6 class="font-weight-bold d-flex align-items-center justify-content-between">
-          {{ $task->title }}
-          <a href="{{ route('tasks.show', $task) }}" class="btn btn-link text-primary p-0" title="Otevřít na celé stránce">
-            <i class="fas fa-external-link-alt fa-xs"></i>
-          </a>
+      <div class="card-header pb-3 pt-4">
+        <h6 class="mb-0">
+          <i class="fas fa-info-circle me-2 text-primary opacity-75"></i>Informace
         </h6>
-        @if($task->description)
-          <p class="text-sm text-secondary">{{ $task->description }}</p>
-        @endif
-        <ul class="list-group list-group-flush mt-3">
-          <li class="list-group-item ps-0 border-0 d-flex justify-content-between align-items-center">
-            <small class="text-secondary">
-              <i class="fas fa-circle-notch fa-sm me-1 opacity-5"></i>Stav
+      </div>
+      <div class="card-body">
+        {{-- Status & Priority --}}
+        <div class="row g-3 mb-4">
+          <div class="col-6">
+            <small class="text-secondary d-block mb-2">
+              <i class="fas fa-circle-notch fa-xs me-1 opacity-75"></i>STAV
             </small>
-            <span class="badge bg-gradient-{{ $sc[$task->status] }}">{{ ['todo'=>'K řešení','in_progress'=>'Probíhá','review'=>'Ke kontrole','done'=>'Dokončeno'][$task->status] ?? $task->status }}</span>
-          </li>
-          <li class="list-group-item ps-0 border-0 d-flex justify-content-between align-items-center">
-            <small class="text-secondary">
-              <i class="fas fa-flag fa-sm me-1 opacity-5"></i>Priorita
-            </small>
-            <span class="badge bg-gradient-{{ $pc[$task->priority] }}">{{ ['low'=>'Nízká','medium'=>'Střední','high'=>'Vysoká'][$task->priority] ?? $task->priority }}</span>
-          </li>
-          <li class="list-group-item ps-0 border-0 d-flex justify-content-between align-items-center">
-            <small class="text-secondary">
-              <i class="fas fa-folder fa-sm me-1 opacity-5"></i>Projekt
-            </small>
-            <a href="{{ route('projects.show', $task->project) }}" class="text-sm">{{ $task->project->name }}</a>
-          </li>
-          <li class="list-group-item ps-0 border-0 d-flex justify-content-between align-items-center">
-            <small class="text-secondary">
-              <i class="fas fa-building fa-sm me-1 opacity-5"></i>Klient
-            </small>
-            <a href="{{ route('clients.show', $task->project->client) }}" class="text-sm">{{ $task->project->client->name }}</a>
-          </li>
-          @if($task->due_date)
-          <li class="list-group-item ps-0 border-0 d-flex justify-content-between align-items-center">
-            <small class="text-secondary">
-              <i class="fas fa-calendar fa-sm me-1 opacity-5"></i>Termín
-            </small>
-            <span class="text-sm {{ $task->due_date->isPast() && $task->status !== 'done' ? 'text-danger' : '' }}">
-              {{ $task->due_date->format('d.m.Y') }}
+            <span class="badge bg-gradient-{{ $sc[$task->status] }} px-3 py-2">
+              {{ ['todo'=>'K řešení','in_progress'=>'Probíhá','review'=>'Ke kontrole','done'=>'Dokončeno'][$task->status] ?? $task->status }}
             </span>
-          </li>
-          @endif
-        </ul>
+          </div>
+          <div class="col-6">
+            <small class="text-secondary d-block mb-2">
+              <i class="fas fa-flag fa-xs me-1 opacity-75"></i>PRIORITA
+            </small>
+            <span class="badge bg-gradient-{{ $pc[$task->priority] }} px-3 py-2">
+              {{ ['low'=>'Nízká','medium'=>'Střední','high'=>'Vysoká'][$task->priority] ?? $task->priority }}
+            </span>
+          </div>
+        </div>
+
+        <hr class="my-3">
+
+        {{-- Projekt & Client --}}
+        <div class="mb-4">
+          <small class="text-secondary d-block mb-2">
+            <i class="fas fa-folder fa-xs me-1 opacity-75"></i>PROJEKT
+          </small>
+          <a href="{{ route('projects.show', $task->project) }}" class="text-sm fw-500">
+            {{ $task->project->name }} <i class="fas fa-external-link-alt fa-xs ms-1 opacity-75"></i>
+          </a>
+        </div>
+
+        <div class="mb-4">
+          <small class="text-secondary d-block mb-2">
+            <i class="fas fa-building fa-xs me-1 opacity-75"></i>KLIENT
+          </small>
+          <a href="{{ route('clients.show', $task->project->client) }}" class="text-sm fw-500">
+            {{ $task->project->client->name }} <i class="fas fa-external-link-alt fa-xs ms-1 opacity-75"></i>
+          </a>
+        </div>
+
+        @if($task->due_date)
+        <div class="mb-4">
+          <small class="text-secondary d-block mb-2">
+            <i class="fas fa-calendar fa-xs me-1 opacity-75"></i>TERMÍN
+          </small>
+          <span class="text-sm {{ $task->due_date->isPast() && $task->status !== 'done' ? 'text-danger fw-bold' : '' }}">
+            {{ $task->due_date->format('d.m.Y') }}
+          </span>
+        </div>
+        @endif
 
         {{-- Assignees --}}
         @if($task->assignees->count())
-        <div class="mt-3 pt-2 border-top">
-          <p class="text-xs text-secondary mb-2">
-            <i class="fas fa-users fa-sm opacity-5 me-1"></i>PŘIŘAZENÍ
-          </p>
-          <div class="d-flex flex-wrap gap-1">
-            @foreach($task->assignees as $assignee)
-              <span class="badge bg-gradient-light text-dark">{{ $assignee->name }}</span>
-            @endforeach
-          </div>
+        <hr class="my-3">
+        <small class="text-secondary d-block mb-2">
+          <i class="fas fa-users fa-xs me-1 opacity-75"></i>PŘIŘAZENÍ ({{ $task->assignees->count() }})
+        </small>
+        <div class="d-flex flex-wrap gap-1">
+          @foreach($task->assignees as $assignee)
+            <span class="badge bg-light text-dark">{{ $assignee->name }}</span>
+          @endforeach
         </div>
         @endif
-
-        @can('delete', $task)
-          <hr>
-          <form method="POST" action="{{ route('tasks.destroy', $task) }}" onsubmit="return confirm('Smazat úkol?')">
-            @csrf @method('DELETE')
-            <button class="btn btn-danger btn-sm w-100">Smazat úkol</button>
-          </form>
-        @endcan
       </div>
     </div>
 

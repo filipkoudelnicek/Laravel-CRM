@@ -86,8 +86,14 @@
     .dark-mode textarea.form-control{background:#2b2f33!important;border-color:rgba(255,255,255,.15)!important;color:#e0e0e0!important}
     .dark-mode .input-group-text{background:#2b2f33!important;border-color:rgba(255,255,255,.15)!important;color:#adb5bd!important}
     .dark-mode .modal-content{background:#212529!important;color:#d4d4d4!important}
-    .dark-mode .modal-header,.dark-mode .modal-footer{border-color:rgba(255,255,255,.1)!important}
-    .dark-mode .btn-close{filter:invert(1)}
+    .dark-mode .modal-header{background:#212529!important;border-color:rgba(255,255,255,.1)!important}
+    .dark-mode .modal-header .modal-title{color:#e8e8e8!important}
+    .dark-mode .modal-body{background:#212529!important;color:#d4d4d4!important}
+    .dark-mode .modal-footer{background:#212529!important;border-color:rgba(255,255,255,.1)!important}
+    .dark-mode .modal-header.bg-transparent{background:transparent!important}
+    .dark-mode .modal-body{background:#212529!important}
+    .dark-mode .modal-footer.bg-white{background:#212529!important}
+    .dark-mode .alert{background:#2b2f33!important;border-color:rgba(255,255,255,.1)!important;color:#d4d4d4!important}
     .dark-mode .nav-tabs .nav-link{color:#adb5bd!important}
     .dark-mode .nav-tabs .nav-link.active{background:#212529!important;color:#fff!important;border-color:rgba(255,255,255,.15)!important}
     .dark-mode .tab-content{background:#212529!important}

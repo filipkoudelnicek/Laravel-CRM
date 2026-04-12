@@ -300,23 +300,6 @@ function editTimeEntry(btn) {
   document.querySelector('input[name="ended_at"]').value = endedAt;
   document.querySelector('textarea[name="notes"]').value = notes;
   
-  new bootstrap.Modal(document.getElementById('timeEntryModal')).show();
-}
-
-// Initialize on load
-document.addEventListener('DOMContentLoaded', initTracking);
-
-// Stop tracking on page leave
-window.addEventListener('beforeunload', () => {
-  if (trackingState.isRunning) {
-    trackingState.localStorage.save({ startTime: trackingState.startTime });
-  }
-});
-</script>
-@endpush
-  document.querySelector('input[name="ended_at"]').value = endedAt;
-  document.querySelector('textarea[name="notes"]').value = notes;
-  
   // Update modal title
   document.querySelector('#timeEntryModal .modal-title').textContent = 'Upravit čas';
   document.querySelector('#timeEntryModal button[type="submit"]').textContent = 'Uložit';
