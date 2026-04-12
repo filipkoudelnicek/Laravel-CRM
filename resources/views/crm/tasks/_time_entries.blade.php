@@ -153,8 +153,10 @@
 let trackingState = {
   isRunning: false,
   startTime: null,
+  lastSavedTime: null,
   intervals: [],
   taskId: {{ $task->id }},
+  autoSaveInterval: 20000, // 20 sekund
   localStorage: {
     key: `tracking_task_${{{ $task->id }}}`,
     
@@ -205,9 +207,58 @@ function startTracking(e) {
   e.preventDefault();
   trackingState.startTime = new Date();
   trackingState.isRunning = true;
+  trackingState.lastSavedTime = trackingState.startTime;
   trackingState.localStorage.save({ startTime: trackingState.startTime });
   updateUI();
   startTimer();
+  startAutoSave();
+}
+
+function startAutoSave() {
+  // Clear previous auto-save intervals
+  const autoSaveId = window.autoSaveIntervalId;
+  if (autoSaveId) clearInterval(autoSaveId);
+  
+  // Auto-save every 20 seconds
+  window.autoSaveIntervalId = setInterval(() => {
+    if (trackingState.isRunning) {
+      autoSaveTracking();
+    }
+  }, trackingState.autoSaveInterval);
+}
+
+function autoSaveTracking() {
+  if (!trackingState.isRunning || !trackingState.startTime) return;
+  
+  const now = new Date();
+  const form = document.getElementById('stopTrackingForm');
+  
+  // Prepare form data
+  form.querySelector('input[name="started_at"]').value = trackingState.startTime.toISOString().slice(0, 16);
+  form.querySelector('input[name="ended_at"]').value = now.toISOString().slice(0, 16);
+  
+  // Submit silently (without page reload)
+  const formData = new FormData(form);
+  
+  fetch(form.action, {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest'
+    }
+  })
+  .then(response => {
+    if (response.ok) {
+      // Auto-save successful, reset the tracking
+      trackingState.lastSavedTime = now;
+      trackingState.startTime = new Date();
+      trackingState.localStorage.save({ startTime: trackingState.startTime });
+      
+      // Show brief notification
+      showNotification('Čas automaticky uložen', 'success');
+    }
+  })
+  .catch(err => console.error('Auto-save error:', err));
 }
 
 function startTimer() {
@@ -249,6 +300,12 @@ function updateStartTime() {
 function stopTracking(e) {
   e.preventDefault();
   if (!trackingState.isRunning) return;
+  
+  // Stop auto-save
+  if (window.autoSaveIntervalId) {
+    clearInterval(window.autoSaveIntervalId);
+    window.autoSaveIntervalId = null;
+  }
   
   const now = new Date();
   const diff = now - trackingState.startTime;
@@ -323,5 +380,30 @@ document.getElementById('timeEntryModal')?.addEventListener('hidden.bs.modal', f
   document.querySelector('#timeEntryModal .modal-title').textContent = 'Přidat čas';
   document.querySelector('#timeEntryModal button[type="submit"]').textContent = 'Přidat';
 });
+
+// Show notification helper
+function showNotification(message, type = 'info') {
+  const alertClass = {
+    'success': 'alert-success',
+    'error': 'alert-danger',
+    'warning': 'alert-warning',
+    'info': 'alert-info'
+  }[type] || 'alert-info';
+  
+  const alertHtml = `
+    <div class="alert ${alertClass} alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  `;
+  
+  document.body.insertAdjacentHTML('beforeend', alertHtml);
+  
+  // Auto-remove after 3 seconds
+  const alertEl = document.querySelector('.position-fixed.alert');
+  if (alertEl) {
+    setTimeout(() => alertEl.remove(), 3000);
+  }
+}
 </script>
 @endpush

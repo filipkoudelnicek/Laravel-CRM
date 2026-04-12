@@ -13,10 +13,16 @@ class TimeEntryController extends Controller
         $this->authorize('create', [TimeEntry::class, $task]);
 
         $data = $request->validate([
-            'started_at' => 'required|date_format:Y-m-d H:i',
-            'ended_at'   => 'nullable|date_format:Y-m-d H:i|after:started_at',
+            'started_at' => 'required|date_format:Y-m-d\TH:i',
+            'ended_at'   => 'nullable|date_format:Y-m-d\TH:i|after:started_at',
             'notes'      => 'nullable|string|max:500',
         ]);
+
+        // Convert from ISO 8601 to database format
+        $data['started_at'] = str_replace('T', ' ', $data['started_at']);
+        if ($data['ended_at']) {
+            $data['ended_at'] = str_replace('T', ' ', $data['ended_at']);
+        }
 
         $data['task_id'] = $task->id;
         $data['created_by'] = auth()->id();
@@ -31,10 +37,16 @@ class TimeEntryController extends Controller
         $this->authorize('update', $timeEntry);
 
         $data = $request->validate([
-            'started_at' => 'required|date_format:Y-m-d H:i',
-            'ended_at'   => 'nullable|date_format:Y-m-d H:i|after:started_at',
+            'started_at' => 'required|date_format:Y-m-d\TH:i',
+            'ended_at'   => 'nullable|date_format:Y-m-d\TH:i|after:started_at',
             'notes'      => 'nullable|string|max:500',
         ]);
+
+        // Convert from ISO 8601 to database format
+        $data['started_at'] = str_replace('T', ' ', $data['started_at']);
+        if ($data['ended_at']) {
+            $data['ended_at'] = str_replace('T', ' ', $data['ended_at']);
+        }
 
         $timeEntry->update($data);
 
