@@ -66,20 +66,6 @@
     </div>
   </div>
   @endif
-
-  <hr class="my-3">
-
-  {{-- Compact Team at bottom if exists --}}
-  @if($project->users->count())
-  <div>
-    <small class="text-secondary d-block mb-2 fw-bold"><i class="fas fa-users fa-xs me-1"></i>TÝM ({{ $project->users->count() }})</small>
-    <div class="d-flex flex-wrap gap-2">
-      @foreach($project->users as $member)
-        <span class="badge bg-warning text-dark text-xs" title="{{ $member->pivot->role }}">{{ $member->name }}</span>
-      @endforeach
-    </div>
-  </div>
-  @endif
 </div>
 
 <div class="modal-footer border-top bg-light pt-3">

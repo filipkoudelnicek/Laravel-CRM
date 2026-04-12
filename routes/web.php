@@ -68,6 +68,7 @@ Route::group(['middleware' => 'auth'], function () {
     // Password Vault
     Route::resource('passwords', PasswordEntryController::class);
     Route::post('passwords/{password}/reveal',  [PasswordEntryController::class, 'reveal'])->name('passwords.reveal');
+    Route::get('passwords/{password}/modal',    [PasswordEntryController::class, 'modalContent'])->name('passwords.modal');
 
     // Invoices
     Route::resource('invoices', InvoiceController::class);

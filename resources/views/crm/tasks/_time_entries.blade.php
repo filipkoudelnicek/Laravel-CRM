@@ -33,52 +33,24 @@
 
     @if($task->timeEntries->count())
       <div class="table-responsive">
-        <table class="table table-sm table-hover">
-          <thead class="table-light">
-            <tr>
-              <th class="text-xs fw-bold">Začátek</th>
-              <th class="text-xs fw-bold">Konec</th>
-              <th class="text-xs fw-bold">Trvání</th>
-              <th class="text-xs fw-bold">Poznámka</th>
-              <th class="text-xs fw-bold text-center" style="width: 80px;">Akce</th>
-            </tr>
-          </thead>
+        <table class="table table-sm">
           <tbody>
             @foreach($task->timeEntries as $entry)
-              <tr class="align-middle">
+              <tr class="align-middle" style="cursor: pointer;" onclick="editTimeEntry(this)" 
+                data-entry-id="{{ $entry->id }}"
+                data-started-at="{{ $entry->started_at->format('Y-m-d\TH:i') }}"
+                data-ended-at="{{ $entry->ended_at ? $entry->ended_at->format('Y-m-d\TH:i') : '' }}"
+                data-notes="{{ $entry->notes }}"
+                data-created-by="{{ $entry->createdBy?->name ?? 'Neznámý' }}">
                 <td class="text-xs">
                   <strong>{{ $entry->started_at->format('d.m.') }}</strong>
                   <span class="text-secondary">{{ $entry->started_at->format('H:i') }}</span>
                 </td>
-                <td class="text-xs">
-                  @if($entry->ended_at)
-                    <span class="text-secondary">{{ $entry->ended_at->format('H:i') }}</span>
-                  @else
-                    <span class="badge bg-warning">Probíhá</span>
-                  @endif
-                </td>
-                <td class="text-xs">
+                <td class="text-xs text-end">
                   <strong class="text-primary">{{ $entry->duration_formatted }}</strong>
                 </td>
-                <td class="text-xs text-secondary">
-                  {{ $entry->notes ? Str::limit($entry->notes, 40) : '—' }}
-                </td>
-                <td class="text-xs text-center">
-                  <div class="btn-group btn-group-sm" role="group">
-                    <button class="btn btn-outline-secondary btn-xs p-1" onclick="editTimeEntry(this)" 
-                      data-entry-id="{{ $entry->id }}"
-                      data-started-at="{{ $entry->started_at->format('Y-m-d\TH:i') }}"
-                      data-ended-at="{{ $entry->ended_at ? $entry->ended_at->format('Y-m-d\TH:i') : '' }}"
-                      data-notes="{{ $entry->notes }}" title="Upravit">
-                      <i class="fas fa-edit fa-sm"></i>
-                    </button>
-                    <form method="POST" action="{{ route('tasks.time-entries.destroy', [$task, $entry]) }}" style="display:inline;" onsubmit="return confirm('Smazat záznam?')">
-                      @csrf @method('DELETE')
-                      <button type="submit" class="btn btn-outline-danger btn-xs p-1" title="Smazat">
-                        <i class="fas fa-trash fa-sm"></i>
-                      </button>
-                    </form>
-                  </div>
+                <td class="text-xs text-end" style="width: 60px;">
+                  <small class="text-secondary">{{ $entry->createdBy?->name ?? 'Dops' }}</small>
                 </td>
               </tr>
             @endforeach
@@ -308,6 +280,11 @@ function stopTracking(e) {
     window.autoSaveIntervalId = null;
   }
   
+  // Stop timer immediately
+  trackingState.intervals.forEach(id => clearInterval(id));
+  trackingState.intervals = [];
+  trackingState.isRunning = false;
+  
   const now = new Date();
   const diff = now - trackingState.startTime;
   
@@ -319,17 +296,12 @@ function stopTracking(e) {
   document.getElementById('stopModal_startedAt').value = trackingState.startTime.toISOString().slice(0, 16);
   document.getElementById('stopModal_endedAt').value = now.toISOString().slice(0, 16);
   
-  // Stop timer
-  trackingState.intervals.forEach(id => clearInterval(id));
-  trackingState.intervals = [];
-  
   // Show modal
   const modal = new bootstrap.Modal(document.getElementById('stopTrackingModal'));
   modal.show();
   
-  // Handle modal close
+  // Handle modal close - reset state
   document.getElementById('stopTrackingModal').addEventListener('hidden.bs.modal', function() {
-    trackingState.isRunning = false;
     trackingState.startTime = null;
     trackingState.localStorage.clear();
     updateUI();
@@ -341,6 +313,7 @@ function editTimeEntry(btn) {
   const startedAt = btn.dataset.startedAt;
   const endedAt = btn.dataset.endedAt;
   const notes = btn.dataset.notes;
+  const createdBy = btn.dataset.createdBy || 'Neznámý';
   
   const form = document.querySelector('#timeEntryModal form');
   form.action = `/tasks/{{ $task->id }}/time-entries/${entryId}`;
@@ -358,8 +331,9 @@ function editTimeEntry(btn) {
   document.querySelector('input[name="ended_at"]').value = endedAt;
   document.querySelector('textarea[name="notes"]').value = notes;
   
-  // Update modal title
+  // Update modal title and user info
   document.querySelector('#timeEntryModal .modal-title').textContent = 'Upravit čas';
+  document.querySelector('#timeEntryModal .modal-body .user-info').textContent = `Zaznamenáno: ${createdBy}`;
   document.querySelector('#timeEntryModal button[type="submit"]').textContent = 'Uložit';
   
   // Show modal
@@ -379,6 +353,7 @@ document.getElementById('timeEntryModal')?.addEventListener('hidden.bs.modal', f
   
   form.reset();
   document.querySelector('#timeEntryModal .modal-title').textContent = 'Přidat čas';
+  document.querySelector('#timeEntryModal .user-info').textContent = '';
   document.querySelector('#timeEntryModal button[type="submit"]').textContent = 'Přidat';
 });
 

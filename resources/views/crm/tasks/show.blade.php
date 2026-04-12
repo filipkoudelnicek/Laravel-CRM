@@ -65,10 +65,6 @@
       </div>
       <div class="card-body">
 
-        @if(session('success'))
-          <div class="alert alert-success py-2">{{ session('success') }}</div>
-        @endif
-
         {{-- New top-level comment --}}
         <form method="POST" action="{{ route('tasks.comments.store', $task) }}" class="mb-4">
           @csrf

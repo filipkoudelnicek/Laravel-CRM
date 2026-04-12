@@ -81,9 +81,9 @@ class PasswordEntryController extends Controller
     {
         $this->authorize('update', $password);
         $clients  = Client::orderBy('name')->get();
+        $projects = Project::orderBy('name')->get();
         $types    = \App\Models\PasswordEntry::TYPES;
-        return view('crm.passwords.edit', compact('password', 'clients', 'projects', 'type
-        return view('crm.passwords.edit', compact('password', 'clients', 'projects'));
+        return view('crm.passwords.edit', compact('password', 'clients', 'projects', 'types'));
     }
 
     public function update(Request $request, PasswordEntry $password)
@@ -150,5 +150,11 @@ class PasswordEntryController extends Controller
         return response()->json([
             'password' => Crypt::decryptString($password->password_encrypted),
         ]);
+    }
+
+    public function modalContent(PasswordEntry $password)
+    {
+        $this->authorize('view', $password);
+        return view('crm.passwords._modal_content', compact('password'));
     }
 }

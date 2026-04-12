@@ -113,6 +113,11 @@
     .dark-mode .table tbody tr:hover{background:rgba(255,255,255,.05)!important}
     .dark-mode .table-hover tbody tr:hover{background:#2b2f33!important}
     .dark-mode .badge{color:#fff}
+    .dark-mode .badge.text-dark{color:#212529!important}
+    .dark-mode .modal-body .text-dark{color:#e0e0e0!important}
+    .dark-mode .modal-body .text-secondary,.dark-mode .modal-body small.text-secondary{color:#8a8f96!important}
+    .dark-mode .modal-body a:not(.btn){color:#7eb8f7!important}
+    .dark-mode .modal-body .bg-light p{color:#d4d4d4!important}
 
     /* Dark mode toggle button */
     .dark-mode-toggle{cursor:pointer;font-size:1.1rem;transition:color .2s}
