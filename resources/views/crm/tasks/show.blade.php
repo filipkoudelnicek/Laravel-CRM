@@ -13,11 +13,21 @@
     <div class="card mb-4">
       <div class="card-header pb-0 pt-4 border-0">
         <div class="d-flex justify-content-between align-items-start">
-          <div>
-            <h4 class="mb-2">{{ $task->title }}</h4>
-            @if($task->description)
-              <p class="text-secondary mb-0" style="white-space: pre-wrap;">{{ $task->description }}</p>
-            @endif
+          <div style="flex: 1;">
+            <h4 class="mb-3">{{ $task->title }}</h4>
+            <div class="d-flex gap-3 mb-3">
+              <span class="badge bg-gradient-{{ $sc[$task->status] ?? 'secondary' }}">
+                {{ ['todo'=>'K řešení','in_progress'=>'Probíhá','review'=>'Ke kontrole','done'=>'Dokončeno'][$task->status] ?? $task->status }}
+              </span>
+              <span class="badge bg-gradient-{{ $pc[$task->priority] ?? 'secondary' }}">
+                {{ ['low'=>'Nízká','medium'=>'Střední','high'=>'Vysoká'][$task->priority] ?? $task->priority }}
+              </span>
+              @if($task->due_date)
+                <small class="text-secondary align-self-center">
+                  <i class="fas fa-calendar fa-xs me-1"></i>{{ $task->due_date->format('d.m.Y') }}
+                </small>
+              @endif
+            </div>
           </div>
           <div class="btn-group btn-group-sm" role="group">
             @can('update', $task)
@@ -36,21 +46,13 @@
           </div>
         </div>
       </div>
+      @if($task->description)
       <div class="card-body pt-2">
-        <div class="d-flex gap-3">
-          <span class="badge bg-gradient-{{ $sc[$task->status] ?? 'secondary' }}">
-            {{ ['todo'=>'K řešení','in_progress'=>'Probíhá','review'=>'Ke kontrole','done'=>'Dokončeno'][$task->status] ?? $task->status }}
-          </span>
-          <span class="badge bg-gradient-{{ $pc[$task->priority] ?? 'secondary' }}">
-            {{ ['low'=>'Nízká','medium'=>'Střední','high'=>'Vysoká'][$task->priority] ?? $task->priority }}
-          </span>
-          @if($task->due_date)
-            <small class="text-secondary align-self-center">
-              <i class="fas fa-calendar fa-xs me-1"></i>{{ $task->due_date->format('d.m.Y') }}
-            </small>
-          @endif
+        <div class="p-3 bg-light rounded" style="white-space: pre-wrap;">
+          {{ $task->description }}
         </div>
       </div>
+      @endif
     </div>
 
     {{-- Comments --}}
@@ -127,51 +129,8 @@
       </div>
     </div>
 
-    {{-- Compact Time Tracking --}}
-    <div class="card">
-      <div class="card-header pb-2 pt-3">
-        <h6 class="mb-0 text-sm">
-          <i class="fas fa-clock me-2 text-primary opacity-75"></i>Čas
-          <span class="badge bg-light text-dark float-end">{{ $task->timeEntries->count() }}</span>
-        </h6>
-      </div>
-      <div class="card-body p-3">
-        
-        {{-- Active timer display --}}
-        <div id="activeTimerContainer" class="d-none mb-2 p-2 bg-light rounded text-center">
-          <h5 class="text-primary mb-1" id="liveTimer" style="font-size: 1.5rem;">00:00:00</h5>
-          <small class="text-secondary">Spuštěno v <span id="startTime">--:--</span></small>
-        </div>
-
-        {{-- Timer buttons --}}
-        <div class="d-flex gap-2 mb-2">
-          <button class="btn btn-sm btn-outline-primary flex-grow-1" id="startTrackingBtn" onclick="startTracking(event)">
-            <i class="fas fa-play fa-xs me-1"></i> Start
-          </button>
-          <button class="btn btn-sm btn-outline-danger flex-grow-1 d-none" id="stopTrackingBtn" onclick="stopTracking(event)">
-            <i class="fas fa-stop fa-xs me-1"></i> Stop
-          </button>
-          <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#timeEntryModal" title="Přidat čas">
-            <i class="fas fa-plus fa-xs"></i>
-          </button>
-        </div>
-
-        {{-- Total time --}}
-        @if($task->timeEntries->count())
-          <div class="text-center p-2 bg-light rounded border-top">
-            @php
-              $totalMinutes = $task->timeEntries->sum(fn($e) => $e->getDurationInMinutesAttribute() ?? 0);
-              $hours = intval($totalMinutes / 60);
-              $mins = $totalMinutes % 60;
-            @endphp
-            <small class="text-secondary d-block">Celkem</small>
-            <strong class="text-primary text-sm">{{ $hours }}h {{ $mins }}m</strong>
-          </div>
-        @else
-          <small class="text-secondary d-block text-center">Žádný čas</small>
-        @endif
-      </div>
-    </div>
+    {{-- Full Time Tracking Component --}}
+    @include('crm.tasks._time_entries', ['task' => $task])
   </div>
 </div>
 

@@ -103,6 +103,16 @@
     .dark-mode .avatar.bg-gradient-primary{opacity:.9}
     .dark-mode p,.dark-mode span:not(.badge):not(.nav-link-text){color:#ccc}
     .dark-mode .card small{color:#8a8f96!important}
+    .dark-mode .bg-light{background-color:#2b2f33!important;color:#d4d4d4!important}
+    .dark-mode .bg-light p{color:#d4d4d4!important}
+    .dark-mode .bg-light textarea,.dark-mode .bg-light input{background:#212529!important;color:#e0e0e0!important;border-color:rgba(255,255,255,.15)!important}
+    .dark-mode .modal-body.bg-light,.dark-mode .modal-footer.bg-light{background:#212529!important}
+    .dark-mode .p-3.bg-light{background:#2b2f33!important}
+    .dark-mode .rounded.bg-light{background:#2b2f33!important}
+    .dark-mode .text-center p,.dark-mode .text-center span:not(.badge){color:#d4d4d4!important}
+    .dark-mode .table tbody tr:hover{background:rgba(255,255,255,.05)!important}
+    .dark-mode .table-hover tbody tr:hover{background:#2b2f33!important}
+    .dark-mode .badge{color:#fff}
 
     /* Dark mode toggle button */
     .dark-mode-toggle{cursor:pointer;font-size:1.1rem;transition:color .2s}

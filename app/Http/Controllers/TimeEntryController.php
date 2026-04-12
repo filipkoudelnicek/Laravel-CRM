@@ -14,7 +14,7 @@ class TimeEntryController extends Controller
 
         $data = $request->validate([
             'started_at' => 'required|date_format:Y-m-d\TH:i',
-            'ended_at'   => 'nullable|date_format:Y-m-d\TH:i|after:started_at',
+            'ended_at'   => 'nullable|date_format:Y-m-d\TH:i|after_or_equal:started_at',
             'notes'      => 'nullable|string|max:500',
         ]);
 
@@ -38,7 +38,7 @@ class TimeEntryController extends Controller
 
         $data = $request->validate([
             'started_at' => 'required|date_format:Y-m-d\TH:i',
-            'ended_at'   => 'nullable|date_format:Y-m-d\TH:i|after:started_at',
+            'ended_at'   => 'nullable|date_format:Y-m-d\TH:i|after_or_equal:started_at',
             'notes'      => 'nullable|string|max:500',
         ]);
 

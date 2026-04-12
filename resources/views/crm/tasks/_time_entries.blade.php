@@ -130,7 +130,7 @@
           <p class="text-xs text-secondary mb-2">ČAS TRVÁNÍ</p>
           <h4 class="text-primary" id="stopModal_duration">00:00</h4>
         </div>
-        <form id="stopTrackingForm" method="POST" action="{{ route('tasks.time-entries.store', $task) }}">
+        <form id="stopTrackingForm" method="POST" action="{{ route('tasks.time-entries.store', $task) }}" onsubmit="handleAutoSaveSubmit(event)">
           @csrf
           <input type="hidden" name="started_at" id="stopModal_startedAt">
           <input type="hidden" name="ended_at" id="stopModal_endedAt">
@@ -183,6 +183,7 @@ function initTracking() {
     trackingState.isRunning = true;
     updateUI();
     startTimer();
+    startAutoSave(); // Resume auto-save from previous session
   }
 }
 
@@ -404,6 +405,25 @@ function showNotification(message, type = 'info') {
   if (alertEl) {
     setTimeout(() => alertEl.remove(), 3000);
   }
+}
+
+// Handle auto-save form submission
+function handleAutoSaveSubmit(e) {
+  // Pokud je to auto-save, předchází submit a dělá fetch
+  // Pokud je to manuální submit z modalu, nechá normální submit
+  if (e.detail === 0) return true; // Allow normal form submission
+}
+
+// Initialize tracking when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  initTracking();
+});
+
+// Also try to initialize immediately in case DOMContentLoaded already fired
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initTracking);
+} else {
+  initTracking();
 }
 </script>
 @endpush
