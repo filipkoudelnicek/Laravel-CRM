@@ -280,10 +280,9 @@ function stopTracking(e) {
     window.autoSaveIntervalId = null;
   }
   
-  // Stop timer immediately
+  // Stop all timers immediately
   trackingState.intervals.forEach(id => clearInterval(id));
   trackingState.intervals = [];
-  trackingState.isRunning = false;
   
   const now = new Date();
   const diff = now - trackingState.startTime;
@@ -298,14 +297,21 @@ function stopTracking(e) {
   
   // Show modal
   const modal = new bootstrap.Modal(document.getElementById('stopTrackingModal'));
-  modal.show();
   
-  // Handle modal close - reset state
-  document.getElementById('stopTrackingModal').addEventListener('hidden.bs.modal', function() {
+  // Handle modal actions
+  const handleModalHide = () => {
+    // Reset tracking state when modal closes (either by cancel or outside click)
+    trackingState.isRunning = false;
     trackingState.startTime = null;
     trackingState.localStorage.clear();
     updateUI();
-  }, { once: true });
+    
+    // Remove listener after first use
+    document.getElementById('stopTrackingModal').removeEventListener('hidden.bs.modal', handleModalHide);
+  };
+  
+  document.getElementById('stopTrackingModal').addEventListener('hidden.bs.modal', handleModalHide);
+  modal.show();
 }
 
 function editTimeEntry(btn) {
