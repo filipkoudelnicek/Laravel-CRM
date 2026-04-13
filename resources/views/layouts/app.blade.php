@@ -112,8 +112,16 @@
     .dark-mode .text-center p,.dark-mode .text-center span:not(.badge){color:#d4d4d4!important}
     .dark-mode .table tbody tr:hover{background:rgba(255,255,255,.05)!important}
     .dark-mode .table-hover tbody tr:hover{background:#2b2f33!important}
-    .dark-mode .badge{color:#fff}
-    .dark-mode .badge.text-dark{color:#212529!important}
+    .dark-mode .badge.bg-light{background-color:#2b2f33!important;color:#d4d4d4!important}
+    .dark-mode .badge.bg-light.text-dark{color:#d4d4d4!important}
+    .dark-mode .badge.text-secondary{color:#8a8f96!important}
+    .dark-mode .bg-light.rounded{background-color:#2b2f33!important;color:#d4d4d4!important}
+    .dark-mode .p-3.bg-light.rounded{background-color:#2b2f33!important}
+    .dark-mode .text-center.p-3.bg-light{background-color:#2b2f33!important}
+    .dark-mode .text-center.p-3.bg-light.rounded{background-color:#2b2f33!important}
+    .dark-mode .text-center.p-3.bg-light.rounded h5{color:#7eb8f7!important}
+    .dark-mode .text-center.p-3.bg-light.rounded p{color:#8a8f96!important}
+    .dark-mode .text-xs.text-secondary{color:#8a8f96!important}
     .dark-mode .modal-body .text-dark{color:#e0e0e0!important}
     .dark-mode .modal-body .text-secondary,.dark-mode .modal-body small.text-secondary{color:#8a8f96!important}
     .dark-mode .modal-body a:not(.btn){color:#7eb8f7!important}

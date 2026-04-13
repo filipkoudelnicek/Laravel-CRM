@@ -72,9 +72,10 @@
                   @endif
                 </td>
                 <td class="px-4 py-3">
-                  <a href="{{ route('clients.show', $project->client) }}" class="text-secondary fw-500">
+                  <button onclick="openDetailModal('{{ route('clients.modal', $project->client) }}')" 
+                          class="btn btn-link text-secondary p-0 text-decoration-none fw-500">
                     {{ $project->client->name }}
-                  </a>
+                  </button>
                 </td>
                 <td class="px-4 py-3 text-center">
                   <span class="badge bg-gradient-{{ $colors[$project->status] ?? 'secondary' }} px-3">

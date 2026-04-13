@@ -7,11 +7,9 @@
         <h5 class="modal-title">{{ $timeEntry ? 'Upravit čas' : 'Přidat čas' }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-      @if($timeEntry)
-        <div class="modal-body border-bottom pb-2">
-          <small class="text-secondary user-info">Zaznamenáno: {{ $timeEntry->createdBy?->name ?? 'Neznámý' }}</small>
-        </div>
-      @endif
+      <div class="modal-body border-bottom pb-2">
+        <small class="text-secondary user-info">{{ $timeEntry ? 'Zaznamenáno: ' . ($timeEntry->createdBy?->name ?? 'Neznámý') : '' }}</small>
+      </div>
       <form method="POST" action="{{ $timeEntry ? route('tasks.time-entries.update', [$task, $timeEntry]) : route('tasks.time-entries.store', $task) }}">
         @csrf
         @if($timeEntry) @method('PUT') @endif
