@@ -118,6 +118,18 @@
     .dark-mode .modal-body .text-secondary,.dark-mode .modal-body small.text-secondary{color:#8a8f96!important}
     .dark-mode .modal-body a:not(.btn){color:#7eb8f7!important}
     .dark-mode .modal-body .bg-light p{color:#d4d4d4!important}
+    .dark-mode .container-fluid{background-color:#1a1d21!important}
+    .dark-mode .card-header{border-color:rgba(255,255,255,.08)!important}
+    .dark-mode .card-header h5{color:#e8e8e8!important}
+    .dark-mode .table thead th{background-color:#2b2f33!important;color:#ccc!important;border-color:rgba(255,255,255,.08)!important}
+    .dark-mode .table tbody td{border-color:rgba(255,255,255,.08)!important}
+    .dark-mode .btn-outline-primary{color:#7eb8f7!important;border-color:#7eb8f7!important}
+    .dark-mode .btn-outline-primary:hover{background-color:rgba(126,184,247,.1)!important;color:#7eb8f7!important;border-color:#7eb8f7!important}
+    .dark-mode .badge.bg-gradient-primary{opacity:.85}
+    .dark-mode .badge.bg-success{background-color:rgba(23,173,55,.3)!important;color:#7eb8f7!important}
+    .dark-mode .badge.bg-warning{background-color:rgba(251,207,51,.2)!important;color:#fbcf33!important}
+    .dark-mode .badge.bg-danger{background-color:rgba(234,6,6,.2)!important;color:#ff667c!important}
+    .dark-mode .badge.bg-info{background-color:rgba(33,82,255,.2)!important;color:#21d4fd!important}
 
     /* Dark mode toggle button */
     .dark-mode-toggle{cursor:pointer;font-size:1.1rem;transition:color .2s}

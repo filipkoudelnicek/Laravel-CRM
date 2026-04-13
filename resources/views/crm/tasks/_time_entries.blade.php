@@ -102,7 +102,7 @@
           <p class="text-xs text-secondary mb-2">ČAS TRVÁNÍ</p>
           <h4 class="text-primary" id="stopModal_duration">00:00</h4>
         </div>
-        <form id="stopTrackingForm" method="POST" action="{{ route('tasks.time-entries.store', $task) }}" onsubmit="handleAutoSaveSubmit(event)">
+        <form id="stopTrackingForm" method="POST" action="{{ route('tasks.time-entries.store', $task) }}" onsubmit="handleStopTrackingSubmit()">
           @csrf
           <input type="hidden" name="started_at" id="stopModal_startedAt">
           <input type="hidden" name="ended_at" id="stopModal_endedAt">
@@ -125,10 +125,8 @@
 let trackingState = {
   isRunning: false,
   startTime: null,
-  lastSavedTime: null,
   intervals: [],
   taskId: {{ $task->id }},
-  autoSaveInterval: 20000, // 20 sekund
   localStorage: {
     key: `tracking_task_${{{ $task->id }}}`,
     
@@ -155,7 +153,6 @@ function initTracking() {
     trackingState.isRunning = true;
     updateUI();
     startTimer();
-    startAutoSave(); // Resume auto-save from previous session
   }
 }
 
@@ -180,58 +177,9 @@ function startTracking(e) {
   e.preventDefault();
   trackingState.startTime = new Date();
   trackingState.isRunning = true;
-  trackingState.lastSavedTime = trackingState.startTime;
   trackingState.localStorage.save({ startTime: trackingState.startTime });
   updateUI();
   startTimer();
-  startAutoSave();
-}
-
-function startAutoSave() {
-  // Clear previous auto-save intervals
-  const autoSaveId = window.autoSaveIntervalId;
-  if (autoSaveId) clearInterval(autoSaveId);
-  
-  // Auto-save every 20 seconds
-  window.autoSaveIntervalId = setInterval(() => {
-    if (trackingState.isRunning) {
-      autoSaveTracking();
-    }
-  }, trackingState.autoSaveInterval);
-}
-
-function autoSaveTracking() {
-  if (!trackingState.isRunning || !trackingState.startTime) return;
-  
-  const now = new Date();
-  const form = document.getElementById('stopTrackingForm');
-  
-  // Prepare form data
-  form.querySelector('input[name="started_at"]').value = trackingState.startTime.toISOString().slice(0, 16);
-  form.querySelector('input[name="ended_at"]').value = now.toISOString().slice(0, 16);
-  
-  // Submit silently (without page reload)
-  const formData = new FormData(form);
-  
-  fetch(form.action, {
-    method: 'POST',
-    body: formData,
-    headers: {
-      'X-Requested-With': 'XMLHttpRequest'
-    }
-  })
-  .then(response => {
-    if (response.ok) {
-      // Auto-save successful, reset the tracking
-      trackingState.lastSavedTime = now;
-      trackingState.startTime = new Date();
-      trackingState.localStorage.save({ startTime: trackingState.startTime });
-      
-      // Show brief notification
-      showNotification('Čas automaticky uložen', 'success');
-    }
-  })
-  .catch(err => console.error('Auto-save error:', err));
 }
 
 function startTimer() {
@@ -249,7 +197,7 @@ function startTimer() {
 }
 
 function updateTimer() {
-  if (!trackingState.isRunning) return;
+  if (!trackingState.isRunning || !trackingState.startTime) return;
   
   const now = new Date();
   const diff = now - trackingState.startTime;
@@ -270,19 +218,23 @@ function updateStartTime() {
   }
 }
 
+function resetTracking() {
+  // Stop all timers
+  trackingState.intervals.forEach(id => clearInterval(id));
+  trackingState.intervals = [];
+  
+  // Reset state
+  trackingState.isRunning = false;
+  trackingState.startTime = null;
+  trackingState.localStorage.clear();
+  
+  // Update UI
+  updateUI();
+}
+
 function stopTracking(e) {
   e.preventDefault();
   if (!trackingState.isRunning) return;
-  
-  // Stop auto-save
-  if (window.autoSaveIntervalId) {
-    clearInterval(window.autoSaveIntervalId);
-    window.autoSaveIntervalId = null;
-  }
-  
-  // Stop all timers immediately
-  trackingState.intervals.forEach(id => clearInterval(id));
-  trackingState.intervals = [];
   
   const now = new Date();
   const diff = now - trackingState.startTime;
@@ -290,27 +242,16 @@ function stopTracking(e) {
   const hours = Math.floor(diff / 3600000);
   const mins = Math.floor((diff % 3600000) / 60000);
   
-  // Update modal
+  // Update modal with current time
   document.getElementById('stopModal_duration').textContent = `${hours}h ${mins}m`;
   document.getElementById('stopModal_startedAt').value = trackingState.startTime.toISOString().slice(0, 16);
   document.getElementById('stopModal_endedAt').value = now.toISOString().slice(0, 16);
   
+  // Stop the timer during modal display
+  resetTracking();
+  
   // Show modal
   const modal = new bootstrap.Modal(document.getElementById('stopTrackingModal'));
-  
-  // Handle modal actions
-  const handleModalHide = () => {
-    // Reset tracking state when modal closes (either by cancel or outside click)
-    trackingState.isRunning = false;
-    trackingState.startTime = null;
-    trackingState.localStorage.clear();
-    updateUI();
-    
-    // Remove listener after first use
-    document.getElementById('stopTrackingModal').removeEventListener('hidden.bs.modal', handleModalHide);
-  };
-  
-  document.getElementById('stopTrackingModal').addEventListener('hidden.bs.modal', handleModalHide);
   modal.show();
 }
 
@@ -388,12 +329,19 @@ function showNotification(message, type = 'info') {
   }
 }
 
-// Handle auto-save form submission
-function handleAutoSaveSubmit(e) {
-  // Pokud je to auto-save, předchází submit a dělá fetch
-  // Pokud je to manuální submit z modalu, nechá normální submit
-  if (e.detail === 0) return true; // Allow normal form submission
+// Handle form submission - normal POST, will reload page
+function handleStopTrackingSubmit(e) {
+  // Allow normal form submission - server will handle it and reload
+  return true;
 }
+
+// Reset modal button action
+document.getElementById('stopTrackingModal')?.addEventListener('hidden.bs.modal', function() {
+  // Clear form
+  const form = document.getElementById('stopTrackingForm');
+  form.reset();
+  document.querySelector('textarea[name="notes"]').value = '';
+});
 
 // Initialize tracking when page loads
 document.addEventListener('DOMContentLoaded', function() {

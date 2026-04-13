@@ -39,8 +39,11 @@
     </div>
 
     <div class="row">
-      <div class="col-md-6">
-        <x-form-field name="due_date" label="Termín" type="date" />
+      <div class="col-md-3">
+        <x-form-field name="starts_at" label="Začátek" type="date" />
+      </div>
+      <div class="col-md-3">
+        <x-form-field name="due_at" label="Termín (do)" type="date" />
       </div>
       <div class="col-md-6">
         <x-form-field name="assignees[]" label="Přiřazení" type="select">

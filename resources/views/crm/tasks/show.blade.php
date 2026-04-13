@@ -22,9 +22,14 @@
               <span class="badge bg-gradient-{{ $pc[$task->priority] ?? 'secondary' }}">
                 {{ ['low'=>'Nízká','medium'=>'Střední','high'=>'Vysoká'][$task->priority] ?? $task->priority }}
               </span>
-              @if($task->due_date)
+              @if($task->starts_at)
                 <small class="text-secondary align-self-center">
-                  <i class="fas fa-calendar fa-xs me-1"></i>{{ $task->due_date->format('d.m.Y') }}
+                  <i class="fas fa-play fa-xs me-1"></i>{{ $task->starts_at->format('d.m.Y') }}
+                </small>
+              @endif
+              @if($task->due_at)
+                <small class="text-secondary align-self-center">
+                  <i class="fas fa-flag-checkered fa-xs me-1"></i>{{ $task->due_at->format('d.m.Y') }}
                 </small>
               @endif
             </div>

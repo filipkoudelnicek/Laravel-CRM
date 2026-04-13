@@ -7,6 +7,7 @@
 
 <div class="modal-header border-0 bg-transparent pb-2">
   <h5 class="modal-title fs-6 fw-bold">{{ $task->title }}</h5>
+  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 </div>
 
 <div class="modal-body pb-0">
@@ -48,13 +49,25 @@
     </a>
   </div>
 
-  {{-- Due Date --}}
-  @if($task->due_date)
+  {{-- Date Range --}}
+  @if($task->starts_at || $task->due_at)
   <div class="mb-4">
-    <small class="text-secondary d-block mb-2 fw-bold"><i class="fas fa-calendar fa-xs me-1"></i>TERMÍN</small>
-    <span class="text-sm {{ $task->due_date->isPast() && $task->status !== 'done' ? 'text-danger fw-bold' : '' }}">
-      {{ $task->due_date->format('d.m.Y') }}
-    </span>
+    <div class="row g-2">
+      @if($task->starts_at)
+      <div class="col-6">
+        <small class="text-secondary d-block mb-2 fw-bold"><i class="fas fa-play fa-xs me-1"></i>ZAČÁTEK</small>
+        <span class="text-sm">{{ $task->starts_at->format('d.m.Y') }}</span>
+      </div>
+      @endif
+      @if($task->due_at)
+      <div class="col-6">
+        <small class="text-secondary d-block mb-2 fw-bold"><i class="fas fa-flag-checkered fa-xs me-1"></i>TERMÍN</small>
+        <span class="text-sm {{ $task->due_at->isPast() && $task->status !== 'done' ? 'text-danger fw-bold' : '' }}">
+          {{ $task->due_at->format('d.m.Y') }}
+        </span>
+      </div>
+      @endif
+    </div>
   </div>
   @endif
 

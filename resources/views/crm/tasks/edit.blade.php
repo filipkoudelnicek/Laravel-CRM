@@ -38,8 +38,11 @@
     </div>
 
     <div class="row">
-      <div class="col-md-6">
-        <x-form-field name="due_date" label="Termín" type="date" value="{{ $task->due_date?->format('Y-m-d') }}" />
+      <div class="col-md-3">
+        <x-form-field name="starts_at" label="Začátek" type="date" value="{{ $task->starts_at?->format('Y-m-d') }}" />
+      </div>
+      <div class="col-md-3">
+        <x-form-field name="due_at" label="Termín (do)" type="date" value="{{ $task->due_at?->format('Y-m-d') }}" />
       </div>
       <div class="col-md-6">
         <x-form-field name="assignees[]" label="Přiřazení" type="select">

@@ -2,6 +2,7 @@
 
 <div class="modal-header border-0 bg-transparent pb-2">
   <h5 class="modal-title fs-6 fw-bold">{{ $client->name }}</h5>
+  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 </div>
 
 <div class="modal-body pb-0">

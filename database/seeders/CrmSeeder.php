@@ -101,7 +101,8 @@ class CrmSeeder extends Seeder
                     'description' => "Description for: {$title}.",
                     'status'      => $taskStatuses[$ti % count($taskStatuses)],
                     'priority'    => $taskPriorities[$ti % count($taskPriorities)],
-                    'due_date'    => now()->addDays(rand(5, 30)),
+                    'starts_at'   => now()->addDays(rand(1, 5)),
+                    'due_at'      => now()->addDays(rand(10, 30)),
                     'project_id'  => $project->id,
                     'created_by'  => $admin->id,
                 ]);

@@ -75,15 +75,13 @@
                           style="font-weight: 500;">
                     {{ $task->title }}
                   </button>
-                  @if($task->description)
-                    <br><small class="text-secondary">{{ Str::limit($task->description, 50) }}</small>
-                  @endif
                 </td>
                 <td class="px-4 py-3">
-                  <div class="text-sm">
-                    <strong>{{ $task->project->name }}</strong>
-                    <br><small class="text-secondary">{{ $task->project->client->name ?? '—' }}</small>
-                  </div>
+                  <button onclick="openDetailModal('{{ route('projects.modal', $task->project) }}')" 
+                          class="btn btn-link text-dark p-0 text-decoration-none fw-500"
+                          style="font-weight: 500;">
+                    {{ $task->project->name }}
+                  </button>
                 </td>
                 <td class="px-4 py-3 text-center">
                   <span class="badge bg-gradient-{{ $sc[$task->status] ?? 'secondary' }} px-3">
@@ -99,9 +97,15 @@
                 </td>
                 <td class="px-4 py-3 text-center">
                   <small class="text-secondary">
-                    @if($task->due_date)
-                      <i class="fas fa-calendar fa-xs me-1 opacity-75"></i>
-                      {{ $task->due_date->format('d.m.Y') }}
+                    @if($task->starts_at || $task->due_at)
+                      <div class="d-flex flex-column gap-1 align-items-center">
+                        @if($task->starts_at)
+                          <span><i class="fas fa-play fa-xs me-1 opacity-75"></i>{{ $task->starts_at->format('d.m') }}</span>
+                        @endif
+                        @if($task->due_at)
+                          <span><i class="fas fa-flag-checkered fa-xs me-1 opacity-75"></i>{{ $task->due_at->format('d.m.Y') }}</span>
+                        @endif
+                      </div>
                     @else
                       —
                     @endif

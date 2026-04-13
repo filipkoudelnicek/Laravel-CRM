@@ -15,7 +15,8 @@ class TaskFactory extends Factory
             'description' => $this->faker->paragraph(),
             'status'      => $this->faker->randomElement(['todo', 'in_progress', 'review', 'done']),
             'priority'    => $this->faker->randomElement(['low', 'medium', 'high']),
-            'due_date'    => $this->faker->optional()->dateTimeBetween('now', '+3 months'),
+            'starts_at'   => $this->faker->optional()->dateTimeBetween('now', '+2 weeks'),
+            'due_at'      => $this->faker->optional()->dateTimeBetween('+2 weeks', '+3 months'),
             'project_id'  => Project::factory(),
             'created_by'  => User::factory(),
         ];
