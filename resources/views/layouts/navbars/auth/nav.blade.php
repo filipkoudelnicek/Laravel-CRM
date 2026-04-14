@@ -54,10 +54,9 @@
                     elseif (str_contains($type, 'Status')) $notifIcon = 'fa-exchange-alt';
                   @endphp
                   <li class="mb-1">
-                    <a class="dropdown-item border-radius-md py-2 mark-notification-read"
+                      <a class="dropdown-item border-radius-md py-2 mark-notification-read notification-unread"
                        href="{{ $notifUrl }}"
-                       data-id="{{ $notif->id }}"
-                       style="background-color:rgba(99,115,129,.06);">
+                        data-id="{{ $notif->id }}">
                       <div class="d-flex align-items-center">
                         <div class="icon icon-shape icon-sm bg-gradient-info shadow text-center border-radius-md me-3 d-flex align-items-center justify-content-center">
                           <i class="fas {{ $notifIcon }} text-white text-xs"></i>
@@ -168,6 +167,11 @@ document.getElementById('darkModeToggle').addEventListener('click', function() {
       'X-CSRF-TOKEN': '{{ csrf_token() }}',
       'Accept': 'application/json'
     }
+  }).catch(function() {
+    body.classList.toggle('dark-mode');
+    var rollbackDark = body.classList.contains('dark-mode');
+    icon.classList.toggle('fa-moon', !rollbackDark);
+    icon.classList.toggle('fa-sun', rollbackDark);
   });
 });
 </script>

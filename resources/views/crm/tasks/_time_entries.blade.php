@@ -50,7 +50,7 @@
                   <strong class="text-primary">{{ $entry->duration_formatted }}</strong>
                 </td>
                 <td class="text-xs text-end" style="width: 60px;">
-                  <small class="text-secondary">{{ $entry->createdBy?->name ?? 'Dops' }}</small>
+                  <small class="text-secondary">{{ $entry->createdBy?->name ?? 'Neznámý' }}</small>
                 </td>
               </tr>
             @endforeach

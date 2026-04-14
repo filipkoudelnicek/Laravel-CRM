@@ -62,7 +62,7 @@
     .dark-mode .form-control,.dark-mode .form-select{background:#2b2f33!important;border-color:rgba(255,255,255,.15)!important;color:#e0e0e0!important}
     .dark-mode .form-label{color:#bbb!important}
     .dark-mode .text-dark{color:#d4d4d4!important}
-    .dark-mode .text-secondary{color:#8a8f96!important}
+    .dark-mode .text-secondary{color:#aeb4bc!important}
     .dark-mode .alert-success{background:linear-gradient(310deg,#17ad37,#98ec2d)!important}
     .dark-mode .alert-danger{background:linear-gradient(310deg,#ea0606,#ff667c)!important}
     .dark-mode footer,.dark-mode footer a{color:#6c757d!important}
@@ -130,6 +130,9 @@
     .dark-mode .card-header{border-color:rgba(255,255,255,.08)!important}
     .dark-mode .card-header h5{color:#e8e8e8!important}
     .dark-mode .table thead th{background-color:#2b2f33!important;color:#ccc!important;border-color:rgba(255,255,255,.08)!important}
+    .dark-mode .table-light,
+    .dark-mode .table-light > th,
+    .dark-mode .table-light > td{background-color:#2b2f33!important;color:#cfd4da!important;border-color:rgba(255,255,255,.08)!important}
     .dark-mode .table tbody td{border-color:rgba(255,255,255,.08)!important}
     .dark-mode .btn-outline-primary{color:#7eb8f7!important;border-color:#7eb8f7!important}
     .dark-mode .btn-outline-primary:hover{background-color:rgba(126,184,247,.1)!important;color:#7eb8f7!important;border-color:#7eb8f7!important}
@@ -138,6 +141,11 @@
     .dark-mode .badge.bg-warning{background-color:rgba(251,207,51,.2)!important;color:#fbcf33!important}
     .dark-mode .badge.bg-danger{background-color:rgba(234,6,6,.2)!important;color:#ff667c!important}
     .dark-mode .badge.bg-info{background-color:rgba(33,82,255,.2)!important;color:#21d4fd!important}
+    .dark-mode .fixed-plugin-button,
+    .dark-mode .fixed-plugin-close-button{color:#d4d4d4!important}
+    .dark-mode .fixed-plugin-button:hover,
+    .dark-mode .fixed-plugin-close-button:hover{color:#ffffff!important}
+    .dark-mode .notification-unread{background-color:rgba(126,184,247,.12)!important}
 
     /* Dark mode toggle button */
     .dark-mode-toggle{cursor:pointer;font-size:1.1rem;transition:color .2s}

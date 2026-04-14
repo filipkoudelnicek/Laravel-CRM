@@ -121,7 +121,7 @@ class ProjectController extends Controller
 
         $data = $request->validate([
             'user_id' => 'required|exists:users,id',
-            'role'    => 'nullable|string|max:50',
+            'role'    => 'nullable|in:lead,member,viewer',
         ]);
 
         $project->users()->syncWithoutDetaching([

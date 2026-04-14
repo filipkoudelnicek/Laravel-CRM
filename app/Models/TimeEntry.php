@@ -25,7 +25,7 @@ class TimeEntry extends Model
         return $this->belongsTo(Task::class);
     }
 
-    public function creator(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function createdBy(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
     }
@@ -43,8 +43,8 @@ class TimeEntry extends Model
     public function getDurationFormattedAttribute(): string
     {
         $minutes = $this->getDurationInMinutesAttribute();
-        if (!$minutes) {
-            return '—';
+        if ($minutes === null) {
+            return 'Probíhá';
         }
         $hours = intval($minutes / 60);
         $mins = $minutes % 60;
