@@ -37,7 +37,11 @@ class TimeEntry extends Model
         if (!$this->ended_at) {
             return null;
         }
-        return intval($this->ended_at->diffInMinutes($this->started_at));
+
+        // Always return a non-negative duration to avoid UI values like "-1m".
+        $minutes = $this->ended_at->diffInMinutes($this->started_at, true);
+
+        return max(0, (int) $minutes);
     }
 
     public function getDurationFormattedAttribute(): string
