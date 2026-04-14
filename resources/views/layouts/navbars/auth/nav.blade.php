@@ -154,26 +154,64 @@ document.querySelectorAll('.mark-notification-read').forEach(function(el) {
 });
 
 // Dark mode toggle
-document.getElementById('darkModeToggle').addEventListener('click', function() {
-  var body = document.body;
-  var icon = this.querySelector('i');
-  body.classList.toggle('dark-mode');
-  var isDark = body.classList.contains('dark-mode');
-  icon.classList.toggle('fa-moon', !isDark);
-  icon.classList.toggle('fa-sun', isDark);
-  fetch('{{ route("toggle-dark-mode") }}', {
-    method: 'POST',
-    headers: {
-      'X-CSRF-TOKEN': '{{ csrf_token() }}',
-      'Accept': 'application/json'
+(function() {
+  var toggle = document.getElementById('darkModeToggle');
+  if (!toggle) return;
+
+  var pending = false;
+
+  function applyDarkModeState(isDark) {
+    document.body.classList.toggle('dark-mode', isDark);
+    var icon = toggle.querySelector('i');
+    if (icon) {
+      icon.classList.toggle('fa-moon', !isDark);
+      icon.classList.toggle('fa-sun', isDark);
     }
-  }).catch(function() {
-    body.classList.toggle('dark-mode');
-    var rollbackDark = body.classList.contains('dark-mode');
-    icon.classList.toggle('fa-moon', !rollbackDark);
-    icon.classList.toggle('fa-sun', rollbackDark);
+  }
+
+  toggle.addEventListener('click', function(e) {
+    e.preventDefault();
+    if (pending) return;
+
+    var previousState = document.body.classList.contains('dark-mode');
+    var nextState = !previousState;
+
+    pending = true;
+    toggle.classList.add('disabled');
+    toggle.setAttribute('aria-disabled', 'true');
+
+    // Optimistic UI update for immediate feedback.
+    applyDarkModeState(nextState);
+
+    fetch('{{ route("toggle-dark-mode") }}', {
+      method: 'POST',
+      headers: {
+        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      credentials: 'same-origin',
+      body: JSON.stringify({ dark_mode: nextState })
+    })
+      .then(function(response) {
+        if (!response.ok) {
+          throw new Error('Failed to save dark mode preference');
+        }
+        return response.json();
+      })
+      .then(function(data) {
+        applyDarkModeState(!!data.dark_mode);
+      })
+      .catch(function() {
+        applyDarkModeState(previousState);
+      })
+      .finally(function() {
+        pending = false;
+        toggle.classList.remove('disabled');
+        toggle.removeAttribute('aria-disabled');
+      });
   });
-});
+})();
 </script>
 @endpush
 

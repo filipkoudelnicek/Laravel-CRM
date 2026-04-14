@@ -262,7 +262,9 @@ function editTimeEntry(btn) {
   const notes = btn.dataset.notes;
   const createdBy = btn.dataset.createdBy || 'Neznámý';
   
-  const form = document.querySelector('#timeEntryModal form');
+  const form = document.getElementById('timeEntryForm');
+  const deleteForm = document.getElementById('deleteTimeEntryForm');
+  const deleteBtn = document.getElementById('deleteTimeEntryBtn');
   form.action = `/tasks/{{ $task->id }}/time-entries/${entryId}`;
   
   let methodInput = form.querySelector('input[name="_method"]');
@@ -274,9 +276,15 @@ function editTimeEntry(btn) {
   }
   methodInput.value = 'PUT';
   
-  document.querySelector('input[name="started_at"]').value = startedAt;
-  document.querySelector('input[name="ended_at"]').value = endedAt;
-  document.querySelector('textarea[name="notes"]').value = notes;
+  form.querySelector('input[name="started_at"]').value = startedAt || '';
+  form.querySelector('input[name="ended_at"]').value = endedAt || '';
+  form.querySelector('textarea[name="notes"]').value = notes || '';
+
+  // Configure delete action for current entry
+  if (deleteForm && deleteBtn) {
+    deleteForm.action = `/tasks/{{ $task->id }}/time-entries/${entryId}`;
+    deleteBtn.classList.remove('d-none');
+  }
   
   // Update modal title and user info
   document.querySelector('#timeEntryModal .modal-title').textContent = 'Upravit čas';
@@ -290,7 +298,9 @@ function editTimeEntry(btn) {
 
 // Reset modal on hide
 document.getElementById('timeEntryModal')?.addEventListener('hidden.bs.modal', function() {
-  const form = this.querySelector('form');
+  const form = document.getElementById('timeEntryForm');
+  const deleteForm = document.getElementById('deleteTimeEntryForm');
+  const deleteBtn = document.getElementById('deleteTimeEntryBtn');
   const taskId = {{ $task->id }};
   form.action = `/tasks/${taskId}/time-entries`;
   form.method = 'POST';
@@ -302,7 +312,23 @@ document.getElementById('timeEntryModal')?.addEventListener('hidden.bs.modal', f
   document.querySelector('#timeEntryModal .modal-title').textContent = 'Přidat čas';
   document.querySelector('#timeEntryModal .user-info').textContent = '';
   document.querySelector('#timeEntryModal button[type="submit"]').textContent = 'Přidat';
+
+  if (deleteBtn) {
+    deleteBtn.classList.add('d-none');
+  }
+  if (deleteForm) {
+    deleteForm.action = `/tasks/${taskId}/time-entries`;
+  }
 });
+
+function submitDeleteTimeEntry() {
+  const deleteForm = document.getElementById('deleteTimeEntryForm');
+  if (!deleteForm) return;
+
+  if (confirm('Opravdu odstranit tento záznam času?')) {
+    deleteForm.submit();
+  }
+}
 
 // Show notification helper
 function showNotification(message, type = 'info') {

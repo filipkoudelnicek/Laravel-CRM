@@ -10,7 +10,7 @@
       <div class="modal-body border-bottom pb-2">
         <small class="text-secondary user-info">{{ $timeEntry ? 'Zaznamenáno: ' . ($timeEntry->createdBy?->name ?? 'Neznámý') : '' }}</small>
       </div>
-      <form method="POST" action="{{ $timeEntry ? route('tasks.time-entries.update', [$task, $timeEntry]) : route('tasks.time-entries.store', $task) }}">
+      <form id="timeEntryForm" method="POST" action="{{ $timeEntry ? route('tasks.time-entries.update', [$task, $timeEntry]) : route('tasks.time-entries.store', $task) }}">
         @csrf
         @if($timeEntry) @method('PUT') @endif
         <div class="modal-body">
@@ -33,9 +33,17 @@
           </div>
         </div>
         <div class="modal-footer">
+          <button type="button" id="deleteTimeEntryBtn" class="btn btn-outline-danger btn-sm me-auto d-none" onclick="submitDeleteTimeEntry()">
+            <i class="fas fa-trash me-1"></i>Odstranit
+          </button>
           <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Zrušit</button>
           <button type="submit" class="btn bg-gradient-primary btn-sm">{{ $timeEntry ? 'Uložit' : 'Přidat' }}</button>
         </div>
+      </form>
+
+      <form id="deleteTimeEntryForm" method="POST" action="{{ route('tasks.time-entries.store', $task) }}" class="d-none">
+        @csrf
+        @method('DELETE')
       </form>
     </div>
   </div>
