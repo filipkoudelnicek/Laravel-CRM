@@ -6,6 +6,7 @@ use App\Http\Requests\InvoiceRequest;
 use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\Project;
+use App\Support\VisibilityScope;
 use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
@@ -13,15 +14,11 @@ class InvoiceController extends Controller
     public function index(Request $request)
     {
         $this->authorize('viewAny', Invoice::class);
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
 
         $query = Invoice::with(['client', 'project']);
-
-        if (!auth()->user()->isAdmin()) {
-            $query->where(function ($q) {
-                $q->whereHas('project.users', fn ($sub) => $sub->where('user_id', auth()->id()))
-                  ->orWhereHas('client.projects.users', fn ($sub) => $sub->where('user_id', auth()->id()));
-            });
-        }
+        VisibilityScope::invoices($query, $user);
 
         if ($search = $request->q) {
             $query->where(fn ($q) =>
@@ -36,9 +33,16 @@ class InvoiceController extends Controller
 
         $invoices = $query->orderByDesc('created_at')->paginate(20)->withQueryString();
 
-        // Summary stats
-        $totalOutstanding = Invoice::whereIn('status', ['sent', 'overdue'])->sum('total');
-        $totalPaidMonth   = Invoice::where('status', 'paid')
+        // Summary stats (respect visibility for non-admin users)
+        $statsQuery = Invoice::query();
+        VisibilityScope::invoices($statsQuery, $user);
+
+        $totalOutstanding = (clone $statsQuery)
+            ->whereIn('status', ['sent', 'overdue'])
+            ->sum('total');
+
+        $totalPaidMonth = (clone $statsQuery)
+            ->where('status', 'paid')
             ->whereMonth('paid_at', now()->month)
             ->whereYear('paid_at', now()->year)
             ->sum('total');

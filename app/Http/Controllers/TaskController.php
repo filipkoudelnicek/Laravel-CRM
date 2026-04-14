@@ -13,10 +13,13 @@ class TaskController extends Controller
 {
     public function index(Request $request)
     {
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
         $query = Task::with(['project.client', 'assignees']);
 
-        if (!auth()->user()->isAdmin()) {
-            $query->whereHas('project.users', fn ($q) => $q->where('user_id', auth()->id()));
+        if (!$user->isAdmin()) {
+            $query->whereHas('project.users', fn ($q) => $q->where('user_id', $user->id));
         }
 
         if ($search = $request->q) {
@@ -38,6 +41,7 @@ class TaskController extends Controller
 
     public function create(Request $request)
     {
+        /** @var \App\Models\User $user */
         $user = auth()->user();
 
         $projects = $user->isAdmin()
@@ -55,6 +59,9 @@ class TaskController extends Controller
 
     public function store(Request $request)
     {
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
         $data = $request->validate([
             'title'       => 'required|string|max:255',
             'description' => 'nullable|string|max:5000',
@@ -69,7 +76,7 @@ class TaskController extends Controller
 
         $project = Project::findOrFail($data['project_id']);
 
-        if (!auth()->user()->isAdmin() && !$project->hasUser(auth()->id())) {
+        if (!$user->isAdmin() && !$project->hasUser($user->id)) {
             abort(403);
         }
 
@@ -104,20 +111,24 @@ class TaskController extends Controller
         $task->load([
             'project.client',
             'assignees',
+            'timeEntries.createdBy',
             'comments.user',
             'comments.replies.user',
             'comments.replies.replies.user',
         ]);
 
+        $commentCount = $task->allComments()->count();
+
         $allUsers = User::orderBy('name')->get();
 
-        return view('crm.tasks.show', compact('task', 'allUsers'));
+        return view('crm.tasks.show', compact('task', 'allUsers', 'commentCount'));
     }
 
     public function edit(Task $task)
     {
         $this->authorize('update', $task);
 
+        /** @var \App\Models\User $user */
         $user = auth()->user();
         $projects = $user->isAdmin()
             ? Project::with('client')->orderBy('name')->get()

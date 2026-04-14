@@ -18,6 +18,7 @@ use App\Http\Controllers\SupportPlanController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TimeEntryController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserPreferenceController;
 
 Route::group(['middleware' => 'auth'], function () {
 
@@ -32,12 +33,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/logout', [SessionsController::class, 'destroy']);
     Route::get('/user-profile',  [InfoUserController::class, 'create']);
     Route::post('/user-profile', [InfoUserController::class, 'store']);
-    Route::post('/toggle-dark-mode', function () {
-        $user = auth()->user();
-        $user->dark_mode = !$user->dark_mode;
-        $user->save();
-        return response()->json(['dark_mode' => $user->dark_mode]);
-    })->name('toggle-dark-mode');
+    Route::post('/toggle-dark-mode', [UserPreferenceController::class, 'toggleDarkMode'])->name('toggle-dark-mode');
 
     // ── CRM ──────────────────────────────────────────────────
 

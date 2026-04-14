@@ -64,7 +64,7 @@
     <div class="card mb-4">
       <div class="card-header pb-0">
         <h6 class="mb-0">
-          <i class="fas fa-comments me-2 text-primary opacity-75"></i>Komentáře ({{ $task->allComments->count() }})
+          <i class="fas fa-comments me-2 text-primary opacity-75"></i>Komentáře ({{ $commentCount }})
         </h6>
         <small class="text-secondary">Použijte @uživatelské_jméno pro zmínku</small>
       </div>

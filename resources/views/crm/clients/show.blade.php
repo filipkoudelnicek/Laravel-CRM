@@ -98,22 +98,22 @@
           <small class="text-secondary d-block mb-2">
             <i class="fas fa-receipt fa-xs me-1 opacity-75"></i>CELKEM FAKTUROVÁNO
           </small>
-          <h6 class="mb-0 fw-bold">{{ number_format($client->totalInvoiced(), 0, ',', ' ') }} Kč</h6>
+          <h6 class="mb-0 fw-bold">{{ number_format($finance['totalInvoiced'], 0, ',', ' ') }} Kč</h6>
         </div>
 
         <div class="mb-4">
           <small class="text-secondary d-block mb-2">
             <i class="fas fa-check-circle fa-xs me-1 opacity-75"></i>ZAPLACENO
           </small>
-          <h6 class="mb-0 fw-bold text-success">{{ number_format($client->totalPaid(), 0, ',', ' ') }} Kč</h6>
+          <h6 class="mb-0 fw-bold text-success">{{ number_format($finance['totalPaid'], 0, ',', ' ') }} Kč</h6>
         </div>
 
         <div class="mb-0">
           <small class="text-secondary d-block mb-2">
             <i class="fas fa-exclamation-circle fa-xs me-1 opacity-75"></i>NEDOPLACENO
           </small>
-          <h6 class="mb-0 fw-bold {{ $client->totalOutstanding() > 0 ? 'text-danger' : '' }}">
-            {{ number_format($client->totalOutstanding(), 0, ',', ' ') }} Kč
+          <h6 class="mb-0 fw-bold {{ $finance['totalOutstanding'] > 0 ? 'text-danger' : '' }}">
+            {{ number_format($finance['totalOutstanding'], 0, ',', ' ') }} Kč
           </h6>
         </div>
       </div>
@@ -202,7 +202,7 @@
             </thead>
             <tbody>
               @php $sc = ['draft'=>'secondary','sent'=>'info','paid'=>'success','overdue'=>'danger','cancelled'=>'dark']; @endphp
-              @foreach($client->invoices()->latest()->take(5)->get() as $inv)
+              @foreach($client->invoices as $inv)
               <tr class="align-middle">
                 <td class="ps-3">
                   <a href="{{ route('invoices.show', $inv) }}" class="text-sm fw-bold text-dark">{{ $inv->invoice_number }}</a>
@@ -238,7 +238,7 @@
         </a>
       </div>
       <div class="card-body">
-        @forelse($client->supportPlans()->active()->get() as $sp)
+        @forelse($client->supportPlans as $sp)
           <div class="d-flex justify-content-between align-items-center mb-3 pb-3 {{ !$loop->last ? 'border-bottom' : '' }}">
             <div>
               <a href="{{ route('support-plans.show', $sp) }}" class="text-sm fw-bold">{{ $sp->title }}</a>

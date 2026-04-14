@@ -6,6 +6,7 @@ use App\Models\Invoice;
 use App\Models\Project;
 use App\Models\SupportPlan;
 use App\Models\Task;
+use App\Support\VisibilityScope;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -14,10 +15,21 @@ class DashboardController extends Controller
     {
         $months = (int) ($request->months ?? 12);
         $currency = $request->currency;
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
+        $visibleInvoices = Invoice::query();
+        $visibleProjects = Project::query();
+        $visibleSupportPlans = SupportPlan::query();
+
+        VisibilityScope::projects($visibleProjects, $user);
+        VisibilityScope::invoices($visibleInvoices, $user);
+        VisibilityScope::supportPlans($visibleSupportPlans, $user);
 
         // ── Monthly revenue (paid invoices, last N months) ────────
         // Using PHP-side grouping for DB-agnostic compatibility (SQLite/MySQL)
-        $revenueQuery = Invoice::where('status', 'paid')
+        $revenueQuery = (clone $visibleInvoices)
+            ->where('status', 'paid')
             ->where('paid_at', '>=', now()->subMonths($months)->startOfMonth())
             ->whereNotNull('paid_at');
 
@@ -42,36 +54,54 @@ class DashboardController extends Controller
         }
 
         // ── Outstanding invoices ─────────────────────────────────
-        $totalOutstandingQ = Invoice::whereIn('status', ['sent', 'overdue']);
+        $totalOutstandingQ = (clone $visibleInvoices)
+            ->whereIn('status', ['sent', 'overdue']);
         if ($currency) $totalOutstandingQ->where('currency', $currency);
         $totalOutstanding = $totalOutstandingQ->sum('total');
 
         // ── Active projects + task breakdown ─────────────────────
-        $activeProjects = Project::whereIn('status', ['active', 'on_hold'])->count();
+        $activeProjects = (clone $visibleProjects)
+            ->whereIn('status', ['active', 'on_hold'])
+            ->count();
 
-        $tasksByStatus = Task::whereHas('project', fn ($q) => $q->whereIn('status', ['active', 'on_hold']))
+        $tasksByStatus = Task::whereHas('project', function ($q) use ($user) {
+                $q->whereIn('status', ['active', 'on_hold']);
+
+                if (!$user->isAdmin()) {
+                    $q->whereHas('users', fn ($sub) => $sub->where('user_id', $user->id));
+                }
+            })
             ->get(['status'])
             ->groupBy('status')
             ->map(fn ($g) => $g->count());
 
         // ── Support plan stats ───────────────────────────────────
-        $activeSupportTotalQ = SupportPlan::active();
+        $activeSupportTotalQ = (clone $visibleSupportPlans)->active();
         if ($currency) $activeSupportTotalQ->where('currency', $currency);
         $activeSupportTotal = $activeSupportTotalQ->sum('price');
-        $activeSupportCount = SupportPlan::active()->count();
+        $activeSupportCount = (clone $visibleSupportPlans)->active()->count();
 
-        $expiringSoonCount  = SupportPlan::expiringSoon(30)->count();
-        $expiringSoonAmountQ = SupportPlan::expiringSoon(30);
+        $expiringSoonCount  = (clone $visibleSupportPlans)->expiringSoon(30)->count();
+        $expiringSoonAmountQ = (clone $visibleSupportPlans)->expiringSoon(30);
         if ($currency) $expiringSoonAmountQ->where('currency', $currency);
         $expiringSoonAmount = $expiringSoonAmountQ->sum('price');
 
         // ── Available currencies for filter ──────────────────────
-        $currencies = Invoice::select('currency')->distinct()->orderBy('currency')->pluck('currency');
-        $supportCurrencies = SupportPlan::select('currency')->distinct()->pluck('currency');
+        $currencies = (clone $visibleInvoices)
+            ->select('currency')
+            ->distinct()
+            ->orderBy('currency')
+            ->pluck('currency');
+
+        $supportCurrencies = (clone $visibleSupportPlans)
+            ->select('currency')
+            ->distinct()
+            ->pluck('currency');
         $allCurrencies = $currencies->merge($supportCurrencies)->unique()->sort()->values();
 
         // ── Recent invoices ──────────────────────────────────────
-        $recentInvoices = Invoice::with('client')
+        $recentInvoices = (clone $visibleInvoices)
+            ->with('client')
             ->orderByDesc('created_at')
             ->limit(5)
             ->get();

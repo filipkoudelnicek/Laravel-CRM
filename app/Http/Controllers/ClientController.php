@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use App\Support\VisibilityScope;
 use Illuminate\Http\Request;
 
 class ClientController extends Controller
@@ -10,13 +11,12 @@ class ClientController extends Controller
     public function index(Request $request)
     {
         $this->authorize('viewAny', Client::class);
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
 
         $query = Client::query();
 
-        // Members only see clients that have projects they're assigned to
-        if (!auth()->user()->isAdmin()) {
-            $query->whereHas('projects.users', fn ($q) => $q->where('user_id', auth()->id()));
-        }
+        VisibilityScope::clients($query, $user);
 
         if ($search = $request->q) {
             $query->where(fn ($q) =>
@@ -59,8 +59,19 @@ class ClientController extends Controller
     public function show(Client $client)
     {
         $this->authorize('view', $client);
-        $client->load(['projects' => fn ($q) => $q->withCount('tasks')->latest()]);
-        return view('crm.clients.show', compact('client'));
+        $client->load([
+            'projects' => fn ($q) => $q->withCount('tasks')->latest(),
+            'invoices' => fn ($q) => $q->latest()->limit(5),
+            'supportPlans' => fn ($q) => $q->active()->orderBy('period_to'),
+        ]);
+
+        $finance = [
+            'totalInvoiced' => (float) $client->invoices()->sum('total'),
+            'totalPaid' => (float) $client->invoices()->where('status', 'paid')->sum('total'),
+            'totalOutstanding' => (float) $client->invoices()->whereIn('status', ['sent', 'overdue'])->sum('total'),
+        ];
+
+        return view('crm.clients.show', compact('client', 'finance'));
     }
 
     public function edit(Client $client)

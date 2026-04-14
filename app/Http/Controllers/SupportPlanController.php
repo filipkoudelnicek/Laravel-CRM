@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\SupportPlanRequest;
 use App\Models\Client;
 use App\Models\SupportPlan;
+use App\Support\VisibilityScope;
 use Illuminate\Http\Request;
 
 class SupportPlanController extends Controller
@@ -12,12 +13,11 @@ class SupportPlanController extends Controller
     public function index(Request $request)
     {
         $this->authorize('viewAny', SupportPlan::class);
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
 
         $query = SupportPlan::with('client');
-
-        if (!auth()->user()->isAdmin()) {
-            $query->whereHas('client.projects.users', fn ($q) => $q->where('user_id', auth()->id()));
-        }
+        VisibilityScope::supportPlans($query, $user);
 
         if ($search = $request->q) {
             $query->where(fn ($q) =>
@@ -32,10 +32,21 @@ class SupportPlanController extends Controller
 
         $plans = $query->orderByDesc('period_to')->paginate(20)->withQueryString();
 
-        // Stats
-        $activeTotal    = SupportPlan::active()->sum('price');
-        $expiringSoon   = SupportPlan::expiringSoon(30)->count();
-        $expiringAmount = SupportPlan::expiringSoon(30)->sum('price');
+        // Stats (respect visibility for non-admin users)
+        $statsQuery = SupportPlan::query();
+        VisibilityScope::supportPlans($statsQuery, $user);
+
+        $activeTotal = (clone $statsQuery)
+            ->active()
+            ->sum('price');
+
+        $expiringSoon = (clone $statsQuery)
+            ->expiringSoon(30)
+            ->count();
+
+        $expiringAmount = (clone $statsQuery)
+            ->expiringSoon(30)
+            ->sum('price');
 
         return view('crm.support-plans.index', compact('plans', 'activeTotal', 'expiringSoon', 'expiringAmount'));
     }

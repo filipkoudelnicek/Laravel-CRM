@@ -111,7 +111,7 @@
           <small class="text-secondary d-block mb-1">
             <i class="fas fa-receipt fa-xs me-1 opacity-75"></i>FAKTUROVÁNO
           </small>
-          <span class="text-sm fw-bold">{{ number_format($project->invoices()->sum('total'), 0, ',', ' ') }} Kč</span>
+          <span class="text-sm fw-bold">{{ number_format($finance['invoicedTotal'], 0, ',', ' ') }} Kč</span>
         </div>
       </div>
     </div>
@@ -201,7 +201,7 @@
             <small class="text-secondary d-block mb-2">
               <i class="fas fa-receipt fa-xs me-1 opacity-75"></i>FAKTUROVÁNO
             </small>
-            <h6 class="mb-0 fw-bold">{{ number_format($project->invoices()->sum('total'), 0, ',', ' ') }} Kč</h6>
+            <h6 class="mb-0 fw-bold">{{ number_format($finance['invoicedTotal'], 0, ',', ' ') }} Kč</h6>
           </div>
         </div>
       </div>

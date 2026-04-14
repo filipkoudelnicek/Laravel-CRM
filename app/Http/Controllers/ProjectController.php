@@ -7,6 +7,7 @@ use App\Models\Project;
 use App\Models\User;
 use App\Notifications\ProjectAssignedNotification;
 use App\Notifications\StatusChangedNotification;
+use App\Support\VisibilityScope;
 use Illuminate\Http\Request;
 
 class ProjectController extends Controller
@@ -14,12 +15,11 @@ class ProjectController extends Controller
     public function index(Request $request)
     {
         $this->authorize('viewAny', Project::class);
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
 
         $query = Project::with('client');
-
-        if (!auth()->user()->isAdmin()) {
-            $query->whereHas('users', fn ($q) => $q->where('user_id', auth()->id()));
-        }
+        VisibilityScope::projects($query, $user);
 
         if ($search = $request->q) {
             $query->where(fn ($q) =>
@@ -69,8 +69,13 @@ class ProjectController extends Controller
     {
         $this->authorize('view', $project);
         $project->load(['client', 'users', 'tasks' => fn ($q) => $q->orderByDesc('created_at')]);
+
+        $finance = [
+            'invoicedTotal' => (float) $project->invoices()->sum('total'),
+        ];
+
         $allUsers = User::orderBy('name')->get();
-        return view('crm.projects.show', compact('project', 'allUsers'));
+        return view('crm.projects.show', compact('project', 'allUsers', 'finance'));
     }
 
     public function edit(Project $project)
