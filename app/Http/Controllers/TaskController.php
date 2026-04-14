@@ -7,6 +7,7 @@ use App\Models\Task;
 use App\Models\User;
 use App\Notifications\StatusChangedNotification;
 use App\Notifications\TaskAssignedNotification;
+use App\Support\RichTextSanitizer;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -72,7 +73,11 @@ class TaskController extends Controller
             'project_id'  => 'required|exists:projects,id',
             'assignees'   => 'nullable|array',
             'assignees.*' => 'exists:users,id',
+            'attachments'   => 'nullable|array|max:8',
+            'attachments.*' => 'file|max:10240|mimes:jpg,jpeg,png,gif,webp,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,zip',
         ]);
+
+        $data['description'] = RichTextSanitizer::sanitize($data['description'] ?? null);
 
         $project = Project::findOrFail($data['project_id']);
 
@@ -101,6 +106,18 @@ class TaskController extends Controller
                 ->each->notify(new TaskAssignedNotification($task, auth()->user()));
         }
 
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                $task->attachments()->create([
+                    'uploaded_by' => auth()->id(),
+                    'path' => $file->store('task-attachments/' . $task->id, 'public'),
+                    'original_name' => $file->getClientOriginalName(),
+                    'mime_type' => $file->getMimeType(),
+                    'size' => $file->getSize() ?? 0,
+                ]);
+            }
+        }
+
         return redirect()->route('tasks.show', $task)->with('success', 'Úkol vytvořen.');
     }
 
@@ -111,10 +128,14 @@ class TaskController extends Controller
         $task->load([
             'project.client',
             'assignees',
+            'attachments',
             'timeEntries.createdBy',
             'comments.user',
+            'comments.attachments',
             'comments.replies.user',
+            'comments.replies.attachments',
             'comments.replies.replies.user',
+            'comments.replies.replies.attachments',
         ]);
 
         $commentCount = $task->allComments()->count();
@@ -153,7 +174,11 @@ class TaskController extends Controller
             'project_id'  => 'required|exists:projects,id',
             'assignees'   => 'nullable|array',
             'assignees.*' => 'exists:users,id',
+            'attachments'   => 'nullable|array|max:8',
+            'attachments.*' => 'file|max:10240|mimes:jpg,jpeg,png,gif,webp,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,zip',
         ]);
+
+        $data['description'] = RichTextSanitizer::sanitize($data['description'] ?? null);
 
         $assignees = $data['assignees'] ?? [];
         unset($data['assignees']);
@@ -182,6 +207,18 @@ class TaskController extends Controller
         if ($oldStatus !== $task->status) {
             $task->assignees->reject(fn ($u) => $u->id === auth()->id())
                 ->each->notify(new StatusChangedNotification($task, $oldStatus, $task->status, auth()->user()));
+        }
+
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                $task->attachments()->create([
+                    'uploaded_by' => auth()->id(),
+                    'path' => $file->store('task-attachments/' . $task->id, 'public'),
+                    'original_name' => $file->getClientOriginalName(),
+                    'mime_type' => $file->getMimeType(),
+                    'size' => $file->getSize() ?? 0,
+                ]);
+            }
         }
 
         return redirect()->route('tasks.show', $task)->with('success', 'Úkol upraven.');

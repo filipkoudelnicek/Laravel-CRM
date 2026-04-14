@@ -30,17 +30,45 @@
         </div>
       </div>
       {{-- Body: highlight @mentions --}}
-      <p class="text-sm mb-0 mt-1">
-        {!! preg_replace('/@([\w\-]+)/', '<strong class="text-primary">@$1</strong>', e($comment->body)) !!}
-      </p>
+      <div class="text-sm mb-0 mt-1 rich-content">{!! $comment->body !!}</div>
+
+      @if($comment->attachments->count())
+      <div class="mt-2 d-flex flex-wrap gap-2">
+        @foreach($comment->attachments as $attachment)
+          <div class="border rounded px-2 py-1 d-flex align-items-center gap-2" style="max-width: 300px;">
+            @if($attachment->isImage())
+              <a href="{{ $attachment->url() }}" target="_blank" rel="noopener noreferrer">
+                <img src="{{ $attachment->url() }}" alt="{{ $attachment->original_name }}" style="width:28px;height:28px;object-fit:cover;border-radius:4px;">
+              </a>
+            @else
+              <i class="fas fa-paperclip text-secondary"></i>
+            @endif
+
+            <a href="{{ $attachment->url() }}" target="_blank" rel="noopener noreferrer" class="text-xs text-truncate d-inline-block" style="max-width:180px;">
+              {{ $attachment->original_name }}
+            </a>
+
+            @can('update', $comment)
+              <form method="POST" action="{{ route('comments.attachments.destroy', [$comment, $attachment]) }}" onsubmit="return confirm('Smazat přílohu?')">
+                @csrf @method('DELETE')
+                <button class="btn btn-link text-danger p-0" type="submit" title="Smazat">
+                  <i class="fas fa-times"></i>
+                </button>
+              </form>
+            @endcan
+          </div>
+        @endforeach
+      </div>
+      @endif
     </div>
 
     {{-- Edit form --}}
     @can('update', $comment)
     <div id="edit-{{ $comment->id }}" class="d-none mt-2">
-      <form method="POST" action="{{ route('comments.update', $comment) }}">
+      <form method="POST" action="{{ route('comments.update', $comment) }}" enctype="multipart/form-data">
         @csrf @method('PUT')
-        <textarea name="body" rows="2" class="form-control form-control-sm mb-1" required>{{ $comment->body }}</textarea>
+        <textarea name="body" rows="2" class="form-control form-control-sm mb-1 rich-editor-source" required>{{ $comment->body }}</textarea>
+        <input type="file" name="attachments[]" class="form-control form-control-sm mb-1" multiple accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip">
         <button class="btn bg-gradient-primary btn-sm">Uložit</button>
         <button type="button" class="btn btn-outline-secondary btn-sm"
                 onclick="document.getElementById('edit-{{ $comment->id }}').classList.add('d-none')">Zrušit</button>
@@ -56,11 +84,12 @@
         ↩ Odpovědět
       </button>
       <div id="reply-{{ $comment->id }}" class="d-none mt-2">
-        <form method="POST" action="{{ route('tasks.comments.store', $comment->task_id) }}">
+        <form method="POST" action="{{ route('tasks.comments.store', $comment->task_id) }}" enctype="multipart/form-data">
           @csrf
           <input type="hidden" name="parent_id" value="{{ $comment->id }}">
-          <textarea name="body" rows="2" class="form-control form-control-sm mb-1"
+          <textarea name="body" rows="2" class="form-control form-control-sm mb-1 rich-editor-source"
                     placeholder="Odpověď… použijte @jméno pro zmínku" required></textarea>
+          <input type="file" name="attachments[]" class="form-control form-control-sm mb-1" multiple accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip">
           <button class="btn bg-gradient-primary btn-sm">Odpovědět</button>
           <button type="button" class="btn btn-outline-secondary btn-sm"
                   onclick="document.getElementById('reply-{{ $comment->id }}').classList.add('d-none')">Zrušit</button>
@@ -70,9 +99,24 @@
     @endif
 
     {{-- Nested replies --}}
-    @foreach($comment->replies as $reply)
-      @include('crm.tasks._comment', ['comment' => $reply, 'depth' => $depth + 1])
-    @endforeach
+    @if($comment->replies->count())
+      <div class="mt-2">
+        <button
+          type="button"
+          class="btn btn-link text-secondary text-xs p-0"
+          data-comment-replies-toggle
+          data-comment-id="{{ $comment->id }}"
+          onclick="toggleCommentReplies(this)">
+          Zobrazit odpovědi ({{ $comment->replies->count() }})
+        </button>
+      </div>
+
+      <div id="replies-{{ $comment->id }}" class="d-none mt-2">
+        @foreach($comment->replies as $reply)
+          @include('crm.tasks._comment', ['comment' => $reply, 'depth' => $depth + 1])
+        @endforeach
+      </div>
+    @endif
   </div>
 </div>
 

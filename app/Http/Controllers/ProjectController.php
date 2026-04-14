@@ -51,6 +51,7 @@ class ProjectController extends Controller
         $data = $request->validate([
             'name'        => 'required|string|max:255',
             'description' => 'nullable|string|max:5000',
+            'web_url'     => 'nullable|url|max:2048',
             'status'      => 'required|in:planned,active,on_hold,done',
             'due_date'    => 'nullable|date',
             'client_id'   => 'required|exists:clients,id',
@@ -92,6 +93,7 @@ class ProjectController extends Controller
         $data = $request->validate([
             'name'           => 'required|string|max:255',
             'description'    => 'nullable|string|max:5000',
+            'web_url'        => 'nullable|url|max:2048',
             'status'         => 'required|in:planned,active,on_hold,done',
             'due_date'       => 'nullable|date',
             'client_id'      => 'required|exists:clients,id',

@@ -54,4 +54,9 @@ class Task extends Model
     {
         return $this->hasMany(TimeEntry::class)->orderByDesc('started_at');
     }
+
+    public function attachments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(TaskAttachment::class)->latest();
+    }
 }

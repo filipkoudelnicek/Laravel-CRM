@@ -39,6 +39,8 @@
 
     <x-form-field name="description" label="Popis" type="textarea" rows="4" value="{{ old('description', $project->description) }}" />
 
+    <x-form-field name="web_url" label="Web URL" type="url" value="{{ old('web_url', $project->web_url) }}" placeholder="https://example.com" />
+
     <div class="row">
       <div class="col-md-6">
         <x-form-field name="estimated_cost" label="Odhadované náklady (Kč)" type="number" step="0.01" min="0" value="{{ old('estimated_cost', $project->estimated_cost) }}" placeholder="0.00" />

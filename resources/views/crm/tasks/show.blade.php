@@ -53,11 +53,50 @@
       </div>
       @if($task->description)
       <div class="card-body pt-2">
-        <div class="p-3 bg-light rounded" style="white-space: pre-wrap;">
-          {{ $task->description }}
+        <div class="p-3 bg-light rounded rich-content">
+          {!! $task->description !!}
         </div>
       </div>
       @endif
+
+      <div class="card-body pt-0">
+        <h6 class="text-sm mb-2">
+          <i class="fas fa-paperclip me-1 opacity-75"></i>Přílohy ({{ $task->attachments->count() }})
+        </h6>
+
+        @if($task->attachments->count())
+          <div class="row g-2">
+            @foreach($task->attachments as $attachment)
+              <div class="col-md-6">
+                <div class="border rounded p-2 d-flex align-items-center justify-content-between gap-2">
+                  <div class="d-flex align-items-center gap-2" style="min-width:0;">
+                    @if($attachment->isImage())
+                      <a href="{{ $attachment->url() }}" target="_blank" rel="noopener noreferrer">
+                        <img src="{{ $attachment->url() }}" alt="{{ $attachment->original_name }}" style="width:36px;height:36px;object-fit:cover;border-radius:6px;">
+                      </a>
+                    @else
+                      <i class="fas fa-file-alt text-secondary"></i>
+                    @endif
+                    <a href="{{ $attachment->url() }}" target="_blank" rel="noopener noreferrer" class="text-sm text-truncate d-inline-block" style="max-width:220px;">
+                      {{ $attachment->original_name }}
+                    </a>
+                  </div>
+                  @can('update', $task)
+                    <form method="POST" action="{{ route('tasks.attachments.destroy', [$task, $attachment]) }}" onsubmit="return confirm('Smazat přílohu?')">
+                      @csrf @method('DELETE')
+                      <button class="btn btn-link text-danger p-0" type="submit" title="Smazat">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </form>
+                  @endcan
+                </div>
+              </div>
+            @endforeach
+          </div>
+        @else
+          <p class="text-sm text-secondary mb-0">Žádné přílohy.</p>
+        @endif
+      </div>
     </div>
 
     {{-- Comments --}}
@@ -71,12 +110,15 @@
       <div class="card-body">
 
         {{-- New top-level comment --}}
-        <form method="POST" action="{{ route('tasks.comments.store', $task) }}" class="mb-4">
+        <form method="POST" action="{{ route('tasks.comments.store', $task) }}" class="mb-4" enctype="multipart/form-data">
           @csrf
           <div class="mb-2">
-            <textarea name="body" rows="3" class="form-control" placeholder="Napište komentář… použijte @jméno pro zmínku"
+            <textarea name="body" rows="3" class="form-control rich-editor-source" placeholder="Napište komentář… použijte @jméno pro zmínku"
               required>{{ old('body') }}</textarea>
             @error('body') <div class="text-danger text-xs mt-1">{{ $message }}</div> @enderror
+          </div>
+          <div class="mb-2">
+            <input type="file" name="attachments[]" class="form-control form-control-sm" multiple accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip">
           </div>
           <button class="btn bg-gradient-primary btn-sm">Přidat komentář</button>
         </form>
@@ -137,5 +179,76 @@
 
 @include('crm.tasks._time_entry_modal', $task)
 @endsection
+
+@push('scripts')
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+<style>
+.rich-content ul,
+.rich-content ol { margin-bottom: 0.5rem; padding-left: 1.25rem; }
+.rich-content p:last-child { margin-bottom: 0; }
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var editors = new Map();
+
+  function initEditor(textarea) {
+    if (!textarea || editors.has(textarea)) {
+      return;
+    }
+
+    ClassicEditor.create(textarea, {
+      toolbar: ['undo', 'redo', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote']
+    }).then(function (editor) {
+      editors.set(textarea, editor);
+    }).catch(function () {});
+  }
+
+  // Initialize visible editors immediately
+  document.querySelectorAll('textarea.rich-editor-source').forEach(function (textarea) {
+    if (textarea.offsetParent !== null) {
+      initEditor(textarea);
+    }
+  });
+
+  // Initialize hidden editors lazily when user focuses them
+  document.addEventListener('focusin', function (event) {
+    var target = event.target;
+    if (target && target.matches('textarea.rich-editor-source')) {
+      initEditor(target);
+    }
+  });
+
+  document.querySelectorAll('form').forEach(function (form) {
+    form.addEventListener('submit', function () {
+      editors.forEach(function (editor) {
+        editor.updateSourceElement();
+      });
+    });
+  });
+});
+
+function toggleCommentReplies(trigger) {
+  if (!trigger) return;
+
+  var commentId = trigger.getAttribute('data-comment-id');
+  if (!commentId) return;
+
+  var replies = document.getElementById('replies-' + commentId);
+  if (!replies) return;
+
+  var hidden = replies.classList.contains('d-none');
+  replies.classList.toggle('d-none');
+
+  var countMatch = trigger.textContent.match(/\((\d+)\)/);
+  var countLabel = countMatch ? countMatch[1] : '';
+
+  if (hidden) {
+    trigger.textContent = countLabel ? 'Skrýt odpovědi (' + countLabel + ')' : 'Skrýt odpovědi';
+  } else {
+    trigger.textContent = countLabel ? 'Zobrazit odpovědi (' + countLabel + ')' : 'Zobrazit odpovědi';
+  }
+}
+</script>
+@endpush
 
 

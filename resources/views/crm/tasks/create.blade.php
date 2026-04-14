@@ -6,7 +6,7 @@
   submitText="Vytvořit úkol"
   backUrl="{{ route('tasks.index') }}">
   
-  <form method="POST" action="{{ route('tasks.store') }}">
+  <form method="POST" action="{{ route('tasks.store') }}" enctype="multipart/form-data">
     @csrf
 
     <x-form-field name="title" label="Název" placeholder="Např. Implementovat login" required />
@@ -55,9 +55,36 @@
       </div>
     </div>
 
-    <x-form-field name="description" label="Popis" type="textarea" rows="4" />
+    <x-form-field name="description" label="Popis" type="textarea" rows="4" inputClass="rich-editor-source" />
+
+    <x-form-field name="attachments[]" label="Přílohy / screenshoty" type="file" inputClass="form-control" multiple accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip" />
+    <small class="text-muted d-block mb-3">Max 8 souborů, každý do 10 MB.</small>
 
     <x-form-actions submitText="Vytvořit úkol" backUrl="{{ route('tasks.index') }}" />
   </form>
 </x-form-layout>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var editors = [];
+  document.querySelectorAll('textarea.rich-editor-source').forEach(function (textarea) {
+    ClassicEditor.create(textarea, {
+      toolbar: ['undo', 'redo', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote']
+    }).then(function (editor) {
+      editors.push(editor);
+    }).catch(function () {});
+  });
+
+  document.querySelectorAll('form').forEach(function (form) {
+    form.addEventListener('submit', function () {
+      editors.forEach(function (editor) {
+        editor.updateSourceElement();
+      });
+    });
+  });
+});
+</script>
+@endpush

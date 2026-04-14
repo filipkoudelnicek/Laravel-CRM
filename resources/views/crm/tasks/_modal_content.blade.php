@@ -14,7 +14,7 @@
   {{-- Description --}}
   @if($task->description)
     <div class="mb-4 p-3 bg-light rounded">
-      <p class="text-sm mb-0" style="white-space: pre-wrap;">{{ $task->description }}</p>
+      <div class="text-sm mb-0 rich-content">{!! $task->description !!}</div>
     </div>
   @endif
 

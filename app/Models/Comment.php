@@ -39,4 +39,9 @@ class Comment extends Model
     {
         return $this->belongsToMany(User::class, 'comment_mentions')->withTimestamps();
     }
+
+    public function attachments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(CommentAttachment::class)->latest();
+    }
 }

@@ -86,6 +86,17 @@
           <span class="text-sm">{{ $project->creator->name ?? '—' }}</span>
         </div>
 
+        @if($project->web_url)
+        <div class="mb-4">
+          <small class="text-secondary d-block mb-2">
+            <i class="fas fa-globe fa-xs me-1 opacity-75"></i>WEB
+          </small>
+          <a href="{{ $project->web_url }}" target="_blank" rel="noopener noreferrer" class="text-sm fw-500">
+            {{ $project->web_url }} <i class="fas fa-external-link-alt fa-xs ms-1 opacity-75"></i>
+          </a>
+        </div>
+        @endif
+
         {{-- Finance --}}
         <hr class="my-3">
 

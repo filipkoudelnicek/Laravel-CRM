@@ -7,29 +7,53 @@ use App\Models\Task;
 use App\Models\User;
 use App\Notifications\MentionNotification;
 use App\Notifications\NewCommentNotification;
+use App\Support\RichTextSanitizer;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class CommentController extends Controller
 {
     public function store(Request $request, Task $task)
     {
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
         // Check user has access to the task's project
-        if (!auth()->user()->isAdmin() &&
-            !$task->project()->whereHas('users', fn ($q) => $q->where('user_id', auth()->id()))->exists()) {
+        if (!$user->isAdmin() &&
+            !$task->project()->whereHas('users', fn ($q) => $q->where('user_id', $user->id))->exists()) {
             abort(403);
         }
 
         $data = $request->validate([
             'body'      => 'required|string|max:5000',
             'parent_id' => 'nullable|exists:comments,id',
+            'attachments'   => 'nullable|array|max:6',
+            'attachments.*' => 'file|max:10240|mimes:jpg,jpeg,png,gif,webp,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,zip',
         ]);
 
-        // XSS: strip all tags, store plain text
-        $data['body']    = strip_tags($data['body']);
+        $data['body'] = RichTextSanitizer::sanitize($data['body']);
+        if (RichTextSanitizer::plainTextLength($data['body']) === 0) {
+            throw ValidationException::withMessages([
+                'body' => 'Komentář nesmí být prázdný.',
+            ]);
+        }
+
         $data['task_id'] = $task->id;
         $data['user_id'] = auth()->id();
 
         $comment = Comment::create($data);
+
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                $comment->attachments()->create([
+                    'uploaded_by' => auth()->id(),
+                    'path' => $file->store('comment-attachments/' . $comment->id, 'public'),
+                    'original_name' => $file->getClientOriginalName(),
+                    'mime_type' => $file->getMimeType(),
+                    'size' => $file->getSize() ?? 0,
+                ]);
+            }
+        }
 
         // Detect and store @mentions, send notifications
         $this->processMentions($comment);
@@ -49,9 +73,30 @@ class CommentController extends Controller
 
         $data = $request->validate([
             'body' => 'required|string|max:5000',
+            'attachments'   => 'nullable|array|max:6',
+            'attachments.*' => 'file|max:10240|mimes:jpg,jpeg,png,gif,webp,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,zip',
         ]);
 
-        $comment->update(['body' => strip_tags($data['body'])]);
+        $body = RichTextSanitizer::sanitize($data['body']);
+        if (RichTextSanitizer::plainTextLength($body) === 0) {
+            throw ValidationException::withMessages([
+                'body' => 'Komentář nesmí být prázdný.',
+            ]);
+        }
+
+        $comment->update(['body' => $body]);
+
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                $comment->attachments()->create([
+                    'uploaded_by' => auth()->id(),
+                    'path' => $file->store('comment-attachments/' . $comment->id, 'public'),
+                    'original_name' => $file->getClientOriginalName(),
+                    'mime_type' => $file->getMimeType(),
+                    'size' => $file->getSize() ?? 0,
+                ]);
+            }
+        }
 
         // Reprocess mentions
         $comment->mentions()->detach();
@@ -72,7 +117,7 @@ class CommentController extends Controller
 
     private function processMentions(Comment $comment): void
     {
-        preg_match_all('/@([\w\-]+)/', $comment->body, $matches);
+        preg_match_all('/@([\w\-]+)/', strip_tags($comment->body), $matches);
 
         if (empty($matches[1])) return;
 

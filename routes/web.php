@@ -17,6 +17,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\SupportPlanController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TimeEntryController;
+use App\Http\Controllers\TaskAttachmentController;
+use App\Http\Controllers\CommentAttachmentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserPreferenceController;
 
@@ -50,6 +52,7 @@ Route::group(['middleware' => 'auth'], function () {
     // Tasks
     Route::get('tasks/{task}/modal',                       [TaskController::class, 'modalView'])->name('tasks.modal');
     Route::resource('tasks', TaskController::class);
+    Route::delete('tasks/{task}/attachments/{attachment}', [TaskAttachmentController::class, 'destroy'])->name('tasks.attachments.destroy');
 
     // Time Entries (scoped to task)
     Route::post('tasks/{task}/time-entries',        [TimeEntryController::class, 'store'])->name('tasks.time-entries.store');
@@ -60,6 +63,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('tasks/{task}/comments',        [CommentController::class, 'store'])->name('tasks.comments.store');
     Route::put('comments/{comment}',            [CommentController::class, 'update'])->name('comments.update');
     Route::delete('comments/{comment}',         [CommentController::class, 'destroy'])->name('comments.destroy');
+    Route::delete('comments/{comment}/attachments/{attachment}', [CommentAttachmentController::class, 'destroy'])->name('comments.attachments.destroy');
 
     // Password Vault
     Route::resource('passwords', PasswordEntryController::class);

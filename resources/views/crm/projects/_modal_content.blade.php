@@ -56,6 +56,15 @@
   </div>
   @endif
 
+  @if($project->web_url)
+  <div class="mb-4">
+    <small class="text-secondary d-block mb-2 fw-bold"><i class="fas fa-globe fa-xs me-1"></i>WEB</small>
+    <a href="{{ $project->web_url }}" target="_blank" rel="noopener noreferrer" class="text-decoration-none text-dark fw-500">
+      {{ $project->web_url }} <i class="fas fa-external-link-alt fa-xs ms-1 opacity-50"></i>
+    </a>
+  </div>
+  @endif
+
   {{-- Team --}}
   @if($project->users->count())
   <div class="mb-4">
