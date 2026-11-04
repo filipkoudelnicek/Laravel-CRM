@@ -19,7 +19,8 @@ class VisibilityScope
     public static function clients(Builder $query, User $user): Builder
     {
         if (!$user->isAdmin()) {
-            $query->whereHas('projects.users', fn ($q) => $q->where('user_id', $user->id));
+            $query->where(fn ($q) => $q->where('created_by', $user->id)
+                ->orWhereHas('projects.users', fn ($sub) => $sub->where('user_id', $user->id)));
         }
 
         return $query;

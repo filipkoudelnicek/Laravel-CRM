@@ -22,7 +22,7 @@ use App\Http\Controllers\CommentAttachmentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserPreferenceController;
 
-Route::group(['middleware' => 'auth'], function () {
+Route::group(['middleware' => ['auth', \App\Http\Middleware\ShareActiveTimer::class]], function () {
 
     Route::get('/', [HomeController::class, 'home']);
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -45,6 +45,8 @@ Route::group(['middleware' => 'auth'], function () {
 
     // Projects
     Route::resource('projects', ProjectController::class);
+    Route::post('projects/{project}/notes', [\App\Http\Controllers\ProjectNoteController::class, 'store'])->name('projects.notes.store');
+    Route::delete('projects/{project}/notes/{note}', [\App\Http\Controllers\ProjectNoteController::class, 'destroy'])->name('projects.notes.destroy');
     Route::post('projects/{project}/users',           [ProjectController::class, 'attachUser'])->name('projects.attach-user');
     Route::delete('projects/{project}/users/{user}',  [ProjectController::class, 'detachUser'])->name('projects.detach-user');
     Route::get('projects/{project}/modal',            [ProjectController::class, 'modalView'])->name('projects.modal');
@@ -55,6 +57,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::delete('tasks/{task}/attachments/{attachment}', [TaskAttachmentController::class, 'destroy'])->name('tasks.attachments.destroy');
 
     // Time Entries (scoped to task)
+    Route::post('tasks/{task}/timer', [\App\Http\Controllers\TimerController::class, 'start'])->name('tasks.timer.start');
+    Route::post('timers/{timeEntry}/stop', [\App\Http\Controllers\TimerController::class, 'stop'])->name('timers.stop');
     Route::post('tasks/{task}/time-entries',        [TimeEntryController::class, 'store'])->name('tasks.time-entries.store');
     Route::put('tasks/{task}/time-entries/{timeEntry}', [TimeEntryController::class, 'update'])->name('tasks.time-entries.update');
     Route::delete('tasks/{task}/time-entries/{timeEntry}', [TimeEntryController::class, 'destroy'])->name('tasks.time-entries.destroy');

@@ -15,25 +15,25 @@
         @if($timeEntry) @method('PUT') @endif
         <div class="modal-body">
           <div class="mb-3">
-            <label class="form-label">Začátek <span class="text-danger">*</span></label>
-            <input type="datetime-local" name="started_at" class="form-control" required
+            <label class="form-label" for="time-start">Začátek <span class="text-danger">*</span></label>
+            <input id="time-start" type="datetime-local" name="started_at" class="form-control" required
               value="{{ $timeEntry ? $timeEntry->started_at->format('Y-m-d\TH:i') : '' }}">
             @error('started_at') <div class="text-danger text-xs mt-1">{{ $message }}</div> @enderror
           </div>
           <div class="mb-3">
-            <label class="form-label">Konec</label>
-            <input type="datetime-local" name="ended_at" class="form-control"
+            <label class="form-label" for="time-end">Konec <span class="text-danger">*</span></label>
+            <input id="time-end" type="datetime-local" name="ended_at" class="form-control" required
               value="{{ $timeEntry ? ($timeEntry->ended_at ? $timeEntry->ended_at->format('Y-m-d\TH:i') : '') : '' }}">
             @error('ended_at') <div class="text-danger text-xs mt-1">{{ $message }}</div> @enderror
           </div>
           <div class="mb-3">
-            <label class="form-label">Poznámka</label>
-            <textarea name="notes" rows="3" class="form-control">{{ $timeEntry ? $timeEntry->notes : '' }}</textarea>
+            <label class="form-label" for="time-notes">Poznámka</label>
+            <textarea id="time-notes" name="notes" rows="3" class="form-control">{{ $timeEntry ? $timeEntry->notes : '' }}</textarea>
             @error('notes') <div class="text-danger text-xs mt-1">{{ $message }}</div> @enderror
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" id="deleteTimeEntryBtn" class="btn btn-outline-danger btn-sm me-auto d-none" onclick="submitDeleteTimeEntry()">
+          <button type="button" id="deleteTimeEntryBtn" class="btn btn-outline-danger btn-sm me-auto d-none">
             <i class="fas fa-trash me-1"></i>Odstranit
           </button>
           <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Zrušit</button>

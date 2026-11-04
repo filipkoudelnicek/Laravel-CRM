@@ -24,6 +24,16 @@ class Project extends Model
 
     // ── relationships ─────────────────────────────────────────
 
+    public function notes(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ProjectNote::class)->latest();
+    }
+
+    public function supportPlans(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(SupportPlan::class);
+    }
+
     public function client(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Client::class);

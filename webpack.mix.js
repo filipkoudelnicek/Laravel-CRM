@@ -12,6 +12,8 @@ const mix = require('laravel-mix');
  */
 
 mix.js('resources/js/app.js', 'public/js')
+    .js('resources/js/workspace.js', 'public/js')
+    .postCss('resources/css/workspace.css', 'public/css')
     .postCss('resources/css/app.css', 'public/css')
     .postCss('resources/css/dark-mode.css', 'public/css')
     .minify('public/assets/js/soft-ui-dashboard.js');

@@ -11,16 +11,22 @@ class SupportPlan extends Model
 
     protected $fillable = [
         'client_id', 'title', 'price', 'currency', 'period_from', 'period_to',
-        'status', 'notes', 'created_by',
+        'status', 'notes', 'created_by', 'project_id', 'paid_at',
     ];
 
     protected $casts = [
         'period_from' => 'date',
         'period_to'   => 'date',
         'price'       => 'decimal:2',
+        'paid_at'     => 'date',
     ];
 
     public const STATUSES = ['active', 'expired', 'cancelled'];
+
+    public function project(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Project::class);
+    }
 
     // ── relationships ─────────────────────────────────────────
 
@@ -39,13 +45,14 @@ class SupportPlan extends Model
     public function scopeActive($query)
     {
         return $query->where('status', 'active')
-                     ->where('period_to', '>=', now()->toDateString());
+                     ->where('period_from', '<=', now(config('app.display_timezone'))->toDateString())
+                     ->where('period_to', '>=', now(config('app.display_timezone'))->toDateString());
     }
 
     public function scopeExpiringSoon($query, int $days = 30)
     {
         return $query->where('status', 'active')
-                     ->whereBetween('period_to', [now()->toDateString(), now()->addDays($days)->toDateString()]);
+                     ->whereBetween('period_to', [now(config('app.display_timezone'))->toDateString(), now(config('app.display_timezone'))->addDays($days)->toDateString()]);
     }
 
     public function scopeExpired($query)
@@ -54,7 +61,7 @@ class SupportPlan extends Model
             $q->where('status', 'expired')
               ->orWhere(function ($q2) {
                   $q2->where('status', 'active')
-                     ->where('period_to', '<', now()->toDateString());
+                     ->where('period_to', '<', now(config('app.display_timezone'))->toDateString());
               });
         });
     }
@@ -63,6 +70,7 @@ class SupportPlan extends Model
     {
         return $this->status === 'active'
             && $this->period_to
-            && $this->period_to->between(now(), now()->addDays($days));
+            && $this->period_to->toDateString() >= now(config('app.display_timezone'))->toDateString()
+            && $this->period_to->toDateString() <= now(config('app.display_timezone'))->addDays($days)->toDateString();
     }
 }

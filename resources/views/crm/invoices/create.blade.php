@@ -6,8 +6,9 @@
   submitText="Vytvořit fakturu"
   backUrl="{{ route('invoices.index') }}">
   
-  <form method="POST" action="{{ route('invoices.store') }}" id="invoiceForm">
+  <form method="POST" action="{{ route('invoices.store') }}" id="invoiceForm" data-client-project-form>
     @csrf
+    <p class="text-sm text-secondary mb-4">Faktura patří klientovi. Projekt můžete doplnit pro vlastní přehled, jeho výběr je volitelný.</p>
 
     <div class="row">
       <div class="col-md-4">
@@ -15,7 +16,7 @@
         <input type="text" class="form-control" value="{{ $nextNumber }}" disabled>
       </div>
       <div class="col-md-4">
-        <x-form-field name="client_id" label="Klient" type="select" required>
+        <x-form-field name="client_id" label="Fakturovaný klient" type="select" required>
           <option value="">— Vyberte klienta —</option>
           @foreach($clients as $c)
             <option value="{{ $c->id }}" @selected(old('client_id', $selectedClient?->id) == $c->id)>{{ $c->name }}</option>
@@ -23,10 +24,10 @@
         </x-form-field>
       </div>
       <div class="col-md-4">
-        <x-form-field name="project_id" label="Projekt" type="select">
+        <x-form-field name="project_id" label="Projekt (volitelně)" type="select">
           <option value="">— Bez projektu —</option>
           @foreach($projects as $p)
-            <option value="{{ $p->id }}" @selected(old('project_id', $selectedProject?->id) == $p->id)>{{ $p->name }}</option>
+            <option value="{{ $p->id }}" data-client="{{ $p->client_id }}" @selected(old('project_id', $selectedProject?->id) == $p->id)>{{ $p->name }}</option>
           @endforeach
         </x-form-field>
       </div>
@@ -67,7 +68,7 @@
       @php $oldItems = old('items', [['name'=>'', 'description'=>'', 'qty'=>'1', 'unit_price'=>'']]); @endphp
       @foreach($oldItems as $i => $item)
       <div class="row align-items-end item-row mb-2" data-index="{{ $i }}">
-        <div class="col-md-4 mb-2">
+        <div class="col-md-5 mb-2">
           <label class="form-label text-xs">Název <span class="text-danger">*</span></label>
           <input type="text" name="items[{{ $i }}][name]" value="{{ $item['name'] ?? '' }}" class="form-control form-control-sm" required>
         </div>
@@ -83,7 +84,7 @@
           <label class="form-label text-xs">Celkem</label>
           <input type="text" class="form-control form-control-sm item-total" readonly tabindex="-1">
         </div>
-        <div class="col-md-1 mb-2">
+        <div class="col-md-12 mb-2 order-last">
           <label class="form-label text-xs">Popis</label>
           <input type="text" name="items[{{ $i }}][description]" value="{{ $item['description'] ?? '' }}" class="form-control form-control-sm" placeholder="…">
         </div>
