@@ -95,7 +95,7 @@
 .workspace .toast-msg.toast-error{background:#a33245;color:#fff}
 .workspace .toast-msg.toast-warning{background:#85600d;color:#fff}
 .workspace .footer{margin-top:32px;border-top:1px solid var(--line)}.workspace .copyright{font-size:11px}.workspace .form-page{max-width:1050px;margin:auto}
-.workspace .btn-group{flex-wrap:nowrap;align-items:center;gap:4px}.workspace .btn-group .btn{margin:0}.workspace .rich-content{color:var(--ink)}.workspace .rich-content a{color:var(--accent)}.workspace .ck-editor{color:#202b3b}
+.workspace .btn-group{flex-wrap:nowrap;align-items:center;gap:4px}.workspace .btn-group .btn{margin:0}.workspace .rich-content{color:var(--ink)}.workspace .rich-content a{color:var(--accent)}
 .workspace .text-xs{font-size:12px!important}.workspace .text-sm{font-size:14px!important}
 .skip-to-content{position:fixed;left:250px;top:-60px;z-index:2000;padding:10px;background:var(--surface)}.skip-to-content:focus{top:10px}
 @media(max-width:1200px){
@@ -235,3 +235,92 @@
 .workspace.dark-mode .form-select{background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23a5b3c9' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e")}
 
 .workspace .data-table .empty-work{white-space:normal}
+
+/* CKEditor adds its own stylesheet and mounts link balloons under <body>.
+   Keep its theme tokens on the workspace so every instance and popup inherits
+   the current palette, including when the user changes theme while writing. */
+.workspace {
+  --ck-font-face: var(--bs-font-sans-serif);
+  --ck-font-size-base: 13px;
+  --ck-border-radius: 6px;
+  --ck-color-base-foreground: var(--canvas);
+  --ck-color-base-background: var(--surface);
+  --ck-color-base-border: var(--line);
+  --ck-color-base-text: var(--ink);
+  --ck-color-text: var(--ink);
+  --ck-color-base-active: var(--accent);
+  --ck-color-base-active-focus: var(--accent);
+  --ck-color-base-focus: var(--accent);
+  --ck-color-base-error: #b33346;
+  --ck-color-focus-border: var(--accent);
+  --ck-color-focus-outer-shadow: var(--tint);
+  --ck-color-focus-disabled-shadow: var(--tint);
+  --ck-color-button-default-hover-background: var(--tint);
+  --ck-color-button-default-active-background: var(--tint);
+  --ck-color-button-on-background: var(--tint);
+  --ck-color-button-on-hover-background: var(--tint);
+  --ck-color-button-on-active-background: var(--tint);
+  --ck-color-button-on-disabled-background: var(--canvas);
+  --ck-color-button-on-color: var(--accent);
+  --ck-color-button-action-background: var(--accent);
+  --ck-color-button-action-hover-background: var(--accent);
+  --ck-color-button-action-active-background: var(--accent);
+  --ck-color-button-action-disabled-background: var(--muted);
+  --ck-color-button-action-text: var(--surface);
+  --ck-color-button-save: var(--success);
+  --ck-color-button-cancel: var(--muted);
+  --ck-color-toolbar-background: var(--canvas);
+  --ck-color-toolbar-border: var(--line);
+  --ck-color-panel-background: var(--surface);
+  --ck-color-panel-border: var(--line);
+  --ck-color-dropdown-panel-background: var(--surface);
+  --ck-color-dropdown-panel-border: var(--line);
+  --ck-color-list-background: var(--surface);
+  --ck-color-list-button-hover-background: var(--tint);
+  --ck-color-list-button-on-background: var(--tint);
+  --ck-color-list-button-on-background-focus: var(--tint);
+  --ck-color-list-button-on-text: var(--ink);
+  --ck-color-input-background: var(--surface);
+  --ck-color-input-border: var(--line);
+  --ck-color-input-text: var(--ink);
+  --ck-color-input-disabled-background: var(--canvas);
+  --ck-color-input-disabled-border: var(--line);
+  --ck-color-input-disabled-text: var(--muted);
+  --ck-color-labeled-field-label-background: var(--surface);
+  --ck-color-engine-placeholder-text: var(--muted);
+  --ck-color-tooltip-background: var(--ink);
+  --ck-color-tooltip-text: var(--surface);
+  --ck-color-link-default: var(--accent);
+  --ck-color-link-selected-background: var(--tint);
+  --ck-color-link-fake-selection: var(--tint);
+  --ck-color-split-button-hover-background: var(--tint);
+  --ck-color-split-button-hover-border: var(--line);
+}
+.workspace.dark-mode { --ck-color-base-error: #ff9ca6; }
+.workspace .ck-editor { color: var(--ink); min-width: 0; }
+.workspace .ck-editor__editable_inline {
+  min-height: 112px;
+  padding: 0 12px;
+  color: var(--ink);
+  font-family: var(--bs-font-sans-serif);
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.workspace .ck-content :is(p, li, blockquote) { color: inherit; }
+.workspace .ck-content a { color: var(--accent); }
+.workspace .ck-content blockquote { border-left-color: var(--line); }
+.workspace .ck.ck-button:focus-visible {
+  outline: 2px solid var(--accent) !important;
+  outline-offset: 1px;
+}
+.workspace input[type=file]::file-selector-button {
+  background: var(--tint);
+  color: var(--ink);
+  border: 0;
+  border-right: 1px solid var(--line);
+  margin: -8px 12px -8px -11px;
+  padding: 10px 12px;
+  font: inherit;
+  cursor: pointer;
+}

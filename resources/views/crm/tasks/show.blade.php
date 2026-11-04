@@ -151,45 +151,6 @@
 .rich-content p:last-child { margin-bottom: 0; }
 </style>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-  var editors = new Map();
-
-  function initEditor(textarea) {
-    if (!textarea || editors.has(textarea) || typeof ClassicEditor === 'undefined') {
-      return;
-    }
-
-    ClassicEditor.create(textarea, {
-      toolbar: ['undo', 'redo', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote']
-    }).then(function (editor) {
-      editors.set(textarea, editor);
-    }).catch(function () {});
-  }
-
-  // Initialize visible editors immediately
-  document.querySelectorAll('textarea.rich-editor-source').forEach(function (textarea) {
-    if (textarea.offsetParent !== null) {
-      initEditor(textarea);
-    }
-  });
-
-  // Initialize hidden editors lazily when user focuses them
-  document.addEventListener('focusin', function (event) {
-    var target = event.target;
-    if (target && target.matches('textarea.rich-editor-source')) {
-      initEditor(target);
-    }
-  });
-
-  document.querySelectorAll('form').forEach(function (form) {
-    form.addEventListener('submit', function () {
-      editors.forEach(function (editor) {
-        editor.updateSourceElement();
-      });
-    });
-  });
-});
-
 function toggleCommentReplies(trigger) {
   if (!trigger) return;
 

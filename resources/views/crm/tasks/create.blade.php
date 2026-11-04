@@ -67,24 +67,4 @@
 
 @push('scripts')
 <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  var editors = [];
-  document.querySelectorAll('textarea.rich-editor-source').forEach(function (textarea) {
-    ClassicEditor.create(textarea, {
-      toolbar: ['undo', 'redo', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote']
-    }).then(function (editor) {
-      editors.push(editor);
-    }).catch(function () {});
-  });
-
-  document.querySelectorAll('form').forEach(function (form) {
-    form.addEventListener('submit', function () {
-      editors.forEach(function (editor) {
-        editor.updateSourceElement();
-      });
-    });
-  });
-});
-</script>
 @endpush

@@ -1,4 +1,37 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const editors = new Map();
+    const initializingEditors = new WeakSet();
+    const initializeEditor = textarea => {
+        if (!window.ClassicEditor || editors.has(textarea) || initializingEditors.has(textarea)) return;
+        initializingEditors.add(textarea);
+        window.ClassicEditor.create(textarea, {
+            toolbar: ['undo', 'redo', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote']
+        }).then(editor => {
+            editors.set(textarea, editor);
+            // Native form validation runs before submit, so waiting until submit
+            // leaves a required, hidden textarea empty and blocks valid comments.
+            const sync = () => editor.updateSourceElement();
+            editor.model.document.on('change:data', sync);
+            sync();
+            textarea.addEventListener('invalid', event => {
+                event.preventDefault();
+                editor.editing.view.focus();
+                window.showToast?.(textarea.name === 'body' ? 'Napište text komentáře.' : 'Vyplňte text pole.', 'error');
+            });
+        }).catch(() => {
+            // A failed CDN/editor initialization keeps the ordinary textarea usable.
+        }).finally(() => initializingEditors.delete(textarea));
+    };
+    document.querySelectorAll('textarea.rich-editor-source').forEach(textarea => {
+        if (textarea.offsetParent !== null) initializeEditor(textarea);
+    });
+    document.addEventListener('focusin', event => {
+        if (event.target.matches('textarea.rich-editor-source')) initializeEditor(event.target);
+    });
+    document.addEventListener('submit', event => {
+        event.target.querySelectorAll('textarea.rich-editor-source').forEach(textarea => editors.get(textarea)?.updateSourceElement());
+    });
+
     // Move menus outside scroll containers so the last row never gets clipped.
     let activeActions = null;
     const closeActions = (restoreFocus = false) => {
