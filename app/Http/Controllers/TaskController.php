@@ -18,7 +18,7 @@ class TaskController extends Controller
         $user = auth()->user();
 
         $query = Task::with(['project.client', 'assignees']);
-        if ($request->boolean('mine')) $query->whereHas('assignees', fn ($q) => $q->where('users.id', $user->id));
+        if ($request->boolean('mine') || $request->input('view') === 'mine') $query->whereHas('assignees', fn ($q) => $q->where('users.id', $user->id));
         if ($request->filled('project_id')) $query->where('project_id', $request->integer('project_id'));
 
         if (!$user->isAdmin()) {
@@ -37,7 +37,14 @@ class TaskController extends Controller
             $query->where('priority', $priority);
         }
 
-        $tasks = $query->orderByDesc('created_at')->paginate(20)->withQueryString();
+        if (in_array($request->input('view'), ['open', 'mine', 'overdue'], true)) $query->where('status', '!=', 'done');
+        if ($request->input('view') === 'overdue') $query->whereDate('due_at', '<', now(config('app.display_timezone'))->toDateString());
+        match ($request->input('sort')) {
+            'title' => $query->orderBy('title'),
+            'due' => $query->orderByRaw('CASE WHEN due_at IS NULL THEN 1 ELSE 0 END')->orderBy('due_at'),
+            default => $query->orderByDesc('created_at'),
+        };
+        $tasks = $query->orderByDesc('id')->paginate(20)->withQueryString();
 
         return view('crm.tasks.index', compact('tasks'));
     }
@@ -224,6 +231,19 @@ class TaskController extends Controller
         }
 
         return redirect()->route('tasks.show', $task)->with('success', 'Úkol upraven.');
+    }
+
+    public function updateStatus(Request $request, Task $task)
+    {
+        $this->authorize('update', $task);
+        $data = $request->validate(['status' => 'required|in:todo,in_progress,review,done']);
+        $oldStatus = $task->status;
+        $task->update($data);
+        if ($oldStatus !== $task->status) {
+            $task->assignees->reject(fn ($user) => $user->id === auth()->id())
+                ->each->notify(new StatusChangedNotification($task, $oldStatus, $task->status, auth()->user()));
+        }
+        return back()->with('success', 'Stav úkolu změněn.');
     }
 
     public function destroy(Task $task)

@@ -2,27 +2,19 @@
 @section('title', 'Moje práce')
 @section('content')
 <div class="workspace-heading">
-  <div><p class="context-line">{{ now(config('app.display_timezone'))->locale('cs')->translatedFormat('l j. F Y') }}</p><h1>Co je dnes na řadě</h1><p class="text-secondary mb-0">Úkoly, domluvy a služby, které potřebují vaši pozornost.</p></div>
+  <div><p class="context-line">{{ now(config('app.display_timezone'))->locale('cs')->translatedFormat('l j. F Y') }}</p><h1>Moje práce</h1><p class="text-secondary mb-0">Přehled rozpracované práce a nejbližších termínů.</p></div>
   <a href="{{ route('tasks.create') }}" class="btn btn-primary">+ Nový úkol</a>
 </div>
 <div class="workspace-metrics">
-  <a href="{{ route('tasks.index', ['mine' => 1]) }}"><span>Moje otevřené úkoly</span><strong>{{ $myTaskCount }}</strong><small>{{ $overdueCount ? $overdueCount . ' po termínu' : 'Žádný po termínu' }}</small></a>
+  <a href="{{ route('tasks.index', ['view' => 'mine']) }}"><span>Moje otevřené úkoly</span><strong>{{ $myTaskCount }}</strong><small>{{ $overdueCount ? $overdueCount . ' po termínu' : 'Žádný po termínu' }}</small></a>
   <a href="{{ route('projects.index', ['status' => 'active']) }}"><span>Aktivní projekty</span><strong>{{ $activeProjects }}</strong><small>Rozpracované zakázky</small></a>
   <div><span>Můj čas tento týden</span><strong>{{ intdiv($weekMinutes, 60) }}<em>h</em> {{ $weekMinutes % 60 }}<em>m</em></strong><small>Uložené časové záznamy</small></div>
   <a href="{{ route('support-plans.index', ['expiring' => 1]) }}"><span>Končící služby</span><strong class="{{ $expiringCount ? 'text-warning' : '' }}">{{ $expiringCount }}</strong><small>V následujících 30 dnech</small></a>
 </div>
 <div class="work-grid">
   <section class="card work-panel">
-    <header class="panel-heading"><div><h2>Moje úkoly</h2><p>Nejbližší termíny jako první</p></div><a href="{{ route('tasks.index', ['mine' => 1]) }}">Zobrazit všechny</a></header>
-    @forelse($myTasks as $task)
-      <a class="work-row" href="{{ route('tasks.show', $task) }}">
-        <span class="task-indicator status-{{ $task->status }}" aria-hidden="true"></span>
-        <span class="row-content"><strong>{{ $task->title }}</strong><small>{{ $task->project->client->name }} / {{ $task->project->name }}</small></span>
-        <span class="row-meta"><span class="status-label">{{ ['todo'=>'K řešení','in_progress'=>'Probíhá','review'=>'Ke kontrole'][$task->status] ?? $task->status }}</span><small class="{{ $task->due_at && $task->due_at->toDateString() < now(config('app.display_timezone'))->toDateString() ? 'text-danger' : '' }}">{{ $task->due_at?->format('j. n.') ?? 'Bez termínu' }}</small></span>
-      </a>
-    @empty
-      <div class="empty-work"><h3>Prostor pro další krok</h3><p>Nemáte přiřazený žádný otevřený úkol.</p><a href="{{ route('tasks.create') }}" class="btn btn-outline-primary">Vytvořit úkol</a></div>
-    @endforelse
+    <header class="panel-heading"><div><h2>Moje úkoly</h2><p>Nejbližší termíny jako první</p></div><a href="{{ route('tasks.index', ['view' => 'mine']) }}">Zobrazit všechny</a></header>
+    @include('crm.tasks._table', ['tasks'=>$myTasks,'compact'=>true])
   </section>
   <section class="card work-panel">
     <header class="panel-heading"><div><h2>Pohlídat prodloužení</h2><p>Služby, kterým končí období</p></div><a href="{{ route('support-plans.index') }}">Všechny služby</a></header>

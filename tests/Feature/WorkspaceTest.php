@@ -28,6 +28,34 @@ class WorkspaceTest extends TestCase
             'items'=>[['name'=>'Vývoj webu','qty'=>2,'unit_price'=>1000]]];
     }
 
+    public function test_quick_status_change_preserves_task_fields_and_requires_project_access(): void
+    {
+        [$admin, $member, , , $task] = $this->workspace();
+        $original = $task->only(['title', 'description', 'priority', 'project_id']);
+        $this->actingAs($member)->from('/tasks?view=mine&sort=due')
+            ->patch(route('tasks.status', $task), ['status'=>'review', 'title'=>'Ignored'])
+            ->assertRedirect('/tasks?view=mine&sort=due');
+        $this->assertSame('review', $task->fresh()->status);
+        $this->assertSame($original, $task->fresh()->only(array_keys($original)));
+        $this->patch(route('tasks.status', $task), ['status'=>'unknown'])->assertSessionHasErrors('status');
+        $stranger = User::factory()->create(['role'=>'member']);
+        $this->actingAs($stranger)->patch(route('tasks.status', $task), ['status'=>'done'])->assertForbidden();
+        $this->assertSame('review', $task->fresh()->status);
+    }
+
+    public function test_task_views_keep_completed_and_unassigned_work_out_of_my_open_tasks(): void
+    {
+        [$admin, $member, , $project, $task] = $this->workspace();
+        $task->update(['title'=>'My open work', 'status'=>'todo']);
+        $done = Task::factory()->create(['project_id'=>$project->id,'title'=>'My finished work','status'=>'done']);
+        $done->assignees()->attach($member, ['assigned_by'=>$admin->id]);
+        Task::factory()->create(['project_id'=>$project->id,'title'=>'Other open work','status'=>'todo']);
+        $this->actingAs($member)->get('/tasks?view=mine')->assertOk()
+            ->assertSee('My open work')->assertDontSee('My finished work')->assertDontSee('Other open work');
+        $this->get('/tasks?view=open')->assertSee('Other open work')->assertDontSee('My finished work');
+        $this->actingAs($admin)->get('/user-management?q='.$member->email)->assertOk()->assertSee($member->email);
+    }
+
     public function test_invoice_belongs_to_client_without_requiring_a_project(): void
     {
         [$admin,,$client] = $this->workspace();

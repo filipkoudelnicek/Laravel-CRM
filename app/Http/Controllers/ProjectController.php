@@ -18,7 +18,7 @@ class ProjectController extends Controller
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
-        $query = Project::with('client');
+        $query = Project::with(['client', 'users']);
         VisibilityScope::projects($query, $user);
 
         if ($search = $request->q) {
@@ -32,7 +32,13 @@ class ProjectController extends Controller
             $query->where('status', $status);
         }
 
-        $projects = $query->withCount('tasks')->orderByDesc('created_at')->paginate(15)->withQueryString();
+        $query->withCount(['tasks', 'tasks as done_tasks_count' => fn ($q) => $q->where('status', 'done')]);
+        match ($request->input('sort')) {
+            'name' => $query->orderBy('name'),
+            'due' => $query->orderByRaw('CASE WHEN due_date IS NULL THEN 1 ELSE 0 END')->orderBy('due_date'),
+            default => $query->orderByDesc('created_at'),
+        };
+        $projects = $query->orderByDesc('id')->paginate(15)->withQueryString();
 
         return view('crm.projects.index', compact('projects'));
     }

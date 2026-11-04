@@ -8,7 +8,7 @@
   <link rel="icon" type="image/png" href="{{ asset('assets/img/favicon.png') }}">
   <title>@yield('title', 'CRM') · Codencio</title>
   <!--     Fonts and icons     -->
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+  @guest<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />@endguest
   <!-- Nucleo Icons -->
   <link href="{{ asset('assets/css/nucleo-icons.css') }}" rel="stylesheet" />
   <link href="{{ asset('assets/css/nucleo-svg.css') }}" rel="stylesheet" />
@@ -16,7 +16,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <!-- CSS Files -->
   <link id="pagestyle" href="{{ asset('assets/css/soft-ui-dashboard.css') }}?v=1.0.3" rel="stylesheet" />
-  <link href="{{ asset('css/dark-mode.css') }}?v={{ file_exists(public_path('css/dark-mode.css')) ? filemtime(public_path('css/dark-mode.css')) : '1' }}" rel="stylesheet" />
   <link href="{{ asset('css/workspace.css') }}?v={{ file_exists(public_path('css/workspace.css')) ? filemtime(public_path('css/workspace.css')) : '1' }}" rel="stylesheet" />
   <style>
     .toast-container{position:fixed;top:1rem;right:1rem;z-index:9999;display:flex;flex-direction:column;gap:.5rem;pointer-events:none}
@@ -51,7 +50,7 @@
   @endguest
 
   {{-- Toast notifications --}}
-  <div class="toast-container" id="toastContainer"></div>
+  <div class="toast-container" id="toastContainer" role="status" aria-live="polite"></div>
 
   <!--   Core JS Files   -->
   <script src="{{ asset('assets/js/core/popper.min.js') }}"></script>

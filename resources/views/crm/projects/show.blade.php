@@ -8,8 +8,8 @@
   $totalMinutes = (int) $entries->sum(fn($e) => $e->duration_in_minutes ?? 0);
 @endphp
 <div class="workspace-heading">
-  <div><a class="context-line" href="{{ route('clients.show', $project->client) }}">{{ $project->client->name }}</a><h1>{{ $project->name }}</h1><div class="d-flex gap-3 align-items-center flex-wrap"><span class="status-label">{{ $statuses[$project->status] }}</span><span class="text-secondary text-sm">{{ $project->due_date ? 'Termín ' . $project->due_date->format('j. n. Y') : 'Bez pevného termínu' }}</span></div></div>
-  <div class="d-flex gap-2 flex-wrap">@can('update', $project)<a href="{{ route('projects.edit', $project) }}" class="btn btn-outline-secondary">Upravit projekt</a>@endcan<a href="{{ route('tasks.create', ['project_id' => $project->id]) }}" class="btn btn-primary">+ Nový úkol</a></div>
+  <div><a class="context-line" href="{{ route('clients.show', $project->client) }}">{{ $project->client->name }}</a><h1>{{ $project->name }}</h1><div class="d-flex gap-3 align-items-center flex-wrap"><span class="status-chip" data-status="{{ $project->status }}">{{ $statuses[$project->status] }}</span><span class="text-secondary text-sm">{{ $project->due_date ? 'Termín ' . $project->due_date->format('j. n. Y') : 'Bez pevného termínu' }}</span></div></div>
+  <div class="heading-actions"><x-record-actions :record="$project" resource="projects" :label="$project->name" /><a href="{{ route('tasks.create', ['project_id' => $project->id]) }}" class="btn btn-primary">+ Nový úkol</a></div>
 </div>
 <nav class="work-tabs" aria-label="Sekce projektu">
   @foreach(['tasks'=>'Úkoly','notes'=>'Poznámky','time'=>'Odpracovaný čas','overview'=>'Přehled a služby'] as $key=>$label)
@@ -19,11 +19,7 @@
 @if($tab === 'tasks')
 <section class="card work-panel">
   <header class="panel-heading"><div><h2>Další kroky</h2><p>{{ $project->tasks->where('status', 'done')->count() }} z {{ $project->tasks->count() }} úkolů dokončeno</p></div></header>
-  @forelse($project->tasks as $task)
-  <a class="work-row" href="{{ route('tasks.show', $task) }}"><span class="task-indicator status-{{ $task->status }}" aria-hidden="true"></span><span class="row-content"><strong>{{ $task->title }}</strong><small>{{ $task->assignees->pluck('name')->join(', ') ?: 'Zatím nepřiřazeno' }}</small></span><span class="row-meta"><span class="status-label">{{ $taskStatuses[$task->status] }}</span><small>{{ $task->due_at?->format('j. n. Y') ?? 'Bez termínu' }}</small></span></a>
-  @empty
-  <div class="empty-work"><h3>Co je potřeba udělat?</h3><p>Rozdělte projekt na konkrétní úkoly a přiřaďte je sobě nebo kolegovi.</p><a href="{{ route('tasks.create', ['project_id' => $project->id]) }}" class="btn btn-primary">Přidat první úkol</a></div>
-  @endforelse
+  @include('crm.tasks._table', ['tasks'=>$project->tasks])
 </section>
 @elseif($tab === 'notes')
 <div class="notes-layout">

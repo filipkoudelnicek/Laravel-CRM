@@ -1,15 +1,8 @@
 @extends('layouts.user_type.auth')
 
 @section('content')
-<div class="row">
-  <div class="col-lg-5">
-    <div class="card mb-4">
-      <div class="card-header pb-0 d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">{{ $password->title }}</h5>
-        @can('update', $password)
-          <a href="{{ route('passwords.edit', $password) }}" class="btn btn-outline-secondary btn-sm">Upravit</a>
-        @endcan
-      </div>
+<div class="workspace-heading"><div><a class="context-line" href="{{ route('passwords.index') }}">Přístupy</a><h1>{{ $password->title }}</h1></div><div class="heading-actions"><x-record-actions :record="$password" resource="passwords" :label="$password->title" /></div></div>
+<div class="row"><div class="col-lg-5"><div class="card mb-4"><div class="card-header"><h2>Přihlašovací údaje</h2></div>
       <div class="card-body pt-2">
         <ul class="list-group list-group-flush">
           <li class="list-group-item ps-0 border-0">
