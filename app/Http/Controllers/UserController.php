@@ -21,11 +21,15 @@ class UserController extends Controller
     /**
      * List all users.
      */
-    public function index()
+    public function index(Request $request)
     {
         $this->authorizeAdmin();
 
-        $users = User::orderBy('name')->get();
+        $users = User::query()
+            ->when($request->filled('q'), fn ($query) => $query->where(fn ($query) =>
+                $query->where('name', 'like', '%'.$request->input('q').'%')
+                    ->orWhere('email', 'like', '%'.$request->input('q').'%')))
+            ->orderBy('name')->paginate(20)->withQueryString();
 
         return view('laravel-examples.user-management', compact('users'));
     }

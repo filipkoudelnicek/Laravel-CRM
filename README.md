@@ -19,6 +19,9 @@ projektové poznámky, úkoly, komentáře, čas a období klientských služeb.
   klientovi. Současná fakturace je interní evidence položek, částek a úhrady;
   neobsahuje kompletní vystavování českých účetních dokladů ani bankovní párování.
 - Světlý a tmavý vzhled, mobilní navigace a ovládání klávesnicí.
+- Kompaktní seznamy s jednou nabídkou akcí na řádek. Název otevírá detail,
+  stav úkolu lze změnit přímo v seznamu. Pohledy a řazení zůstávají v URL.
+- Detail klienta rozdělený na projekty, služby a faktury s kontaktem vedle obsahu.
 
 ## Technologie a požadavky
 
@@ -81,9 +84,12 @@ u služeb. Existující úhrady automaticky neodhadují: prázdné datum znamen�
 Starý časovač ukládal rozpracovaný začátek pouze do konkrétního prohlížeče;
 před aktualizací jej zastavte a uložte ve staré verzi.
 
-Frontend sestavte přes `npm ci && npm run production` na vývojovém stroji
-nebo v CI a nahrajte i vygenerované soubory v `public`. Ty jsou v Gitu
-ignorované. Složky `storage` a `bootstrap/cache` musí být zapisovatelné.
+Sestavené soubory `public/css/workspace.css` a `public/js/workspace.js` jsou
+součástí repozitáře, takže aktualizace pracovního rozhraní nevyžaduje Node na
+hostingu. Po úpravě jejich zdrojů spusťte `npm ci && npm run production` na
+vývojovém stroji nebo v CI a odešlete i nové sestavené soubory. Ostatní nově
+generované soubory v `public` zůstávají ignorované. Složky `storage` a
+`bootstrap/cache` musí být zapisovatelné.
 
 ## Sdílený hosting
 

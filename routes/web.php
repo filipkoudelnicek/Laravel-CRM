@@ -53,6 +53,7 @@ Route::group(['middleware' => ['auth', \App\Http\Middleware\ShareActiveTimer::cl
 
     // Tasks
     Route::get('tasks/{task}/modal',                       [TaskController::class, 'modalView'])->name('tasks.modal');
+    Route::patch('tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.status');
     Route::resource('tasks', TaskController::class);
     Route::delete('tasks/{task}/attachments/{attachment}', [TaskAttachmentController::class, 'destroy'])->name('tasks.attachments.destroy');
 

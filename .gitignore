@@ -16,8 +16,11 @@ yarn-error.log
 /.idea
 /.vscode
 
-/public/js
-/public/css
+/public/js/*
+!/public/js/workspace.js
+!/public/js/workspace.js.LICENSE.txt
+/public/css/*
+!/public/css/workspace.css
 /public/assets/css
 /public/assets/js
 /public/mix-manifest.json

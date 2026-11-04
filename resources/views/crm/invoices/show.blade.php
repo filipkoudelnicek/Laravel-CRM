@@ -1,30 +1,8 @@
 @extends('layouts.user_type.auth')
 
 @section('content')
-<div class="row">
-  <div class="col-lg-8">
-    <div class="card mb-4">
-      <div class="card-header pb-0 d-flex justify-content-between align-items-center">
-        <div>
-          <h5 class="mb-0">Faktura {{ $invoice->invoice_number }}</h5>
-          @php
-            $statusColors = ['draft'=>'secondary','sent'=>'info','paid'=>'success','overdue'=>'danger','cancelled'=>'dark'];
-          @endphp
-          @php $invStatusLabels = ['draft'=>'Koncept','sent'=>'Odesláno','paid'=>'Zaplaceno','overdue'=>'Po splatnosti','cancelled'=>'Zrušeno']; @endphp
-          <span class="badge bg-gradient-{{ $statusColors[$invoice->status] ?? 'secondary' }} mt-1">{{ $invStatusLabels[$invoice->status] ?? ucfirst($invoice->status) }}</span>
-        </div>
-        <div class="d-flex gap-2">
-          @can('update', $invoice)
-            <a href="{{ route('invoices.edit', $invoice) }}" class="btn btn-outline-secondary btn-sm">Upravit</a>
-          @endcan
-          @can('delete', $invoice)
-            <form method="POST" action="{{ route('invoices.destroy', $invoice) }}" onsubmit="return confirm('Smazat fakturu?')">
-              @csrf @method('DELETE')
-              <button class="btn btn-outline-danger btn-sm">Smazat</button>
-            </form>
-          @endcan
-        </div>
-      </div>
+<div class="workspace-heading"><div><a class="context-line" href="{{ route('clients.show',$invoice->client) }}">{{ $invoice->client->name }}</a><h1>Faktura {{ $invoice->invoice_number }}</h1><span class="status-chip" data-status="{{ $invoice->status }}">{{ ['draft'=>'Koncept','sent'=>'Odesláno','paid'=>'Zaplaceno','overdue'=>'Po splatnosti','cancelled'=>'Zrušeno'][$invoice->status] }}</span></div><div class="heading-actions">@can('update',$invoice)<a href="{{ route('invoices.edit',$invoice) }}" class="btn btn-outline-secondary">Upravit fakturu</a>@endcan<x-record-actions :record="$invoice" resource="invoices" :label="$invoice->invoice_number" /></div></div>
+<div class="row"><div class="col-lg-8"><div class="card mb-4"><div class="card-header"><h2>Položky faktury</h2></div>
       <div class="card-body pt-2">
         {{-- Items table --}}
         <div class="table-responsive">

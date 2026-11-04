@@ -14,6 +14,7 @@
             @include('layouts.footers.auth.footer')
         </div>
     </main>
+    <x-confirm-dialog />
 
 @endsection
 
