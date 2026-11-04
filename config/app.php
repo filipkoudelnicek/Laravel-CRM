@@ -72,6 +72,7 @@ return [
     */
 
     'timezone' => 'UTC',
+    'display_timezone' => env('APP_DISPLAY_TIMEZONE', 'Europe/Prague'),
 
     /*
     |--------------------------------------------------------------------------

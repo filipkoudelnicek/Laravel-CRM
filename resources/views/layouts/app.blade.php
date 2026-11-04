@@ -2,10 +2,11 @@
 <html lang="cs">
 <head>
   <meta charset="utf-8" />
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('assets/img/apple-icon.png') }}">
   <link rel="icon" type="image/png" href="{{ asset('assets/img/favicon.png') }}">
-  <title>CRM — Codencio</title>
+  <title>@yield('title', 'CRM') · Codencio</title>
   <!--     Fonts and icons     -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
   <!-- Nucleo Icons -->
@@ -15,7 +16,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <!-- CSS Files -->
   <link id="pagestyle" href="{{ asset('assets/css/soft-ui-dashboard.css') }}?v=1.0.3" rel="stylesheet" />
-  <link href="{{ asset('css/dark-mode.css') }}?v={{ filemtime(public_path('css/dark-mode.css')) }}" rel="stylesheet" />
+  <link href="{{ asset('css/dark-mode.css') }}?v={{ file_exists(public_path('css/dark-mode.css')) ? filemtime(public_path('css/dark-mode.css')) : '1' }}" rel="stylesheet" />
+  <link href="{{ asset('css/workspace.css') }}?v={{ file_exists(public_path('css/workspace.css')) ? filemtime(public_path('css/workspace.css')) : '1' }}" rel="stylesheet" />
   <style>
     .toast-container{position:fixed;top:1rem;right:1rem;z-index:9999;display:flex;flex-direction:column;gap:.5rem;pointer-events:none}
     .toast-msg{pointer-events:auto;min-width:280px;max-width:400px;padding:.75rem 1.25rem;border-radius:.5rem;color:#fff;font-size:.875rem;box-shadow:0 .5rem 1rem rgba(0,0,0,.15);animation:toastIn .35s ease-out}
@@ -30,8 +32,7 @@
     .nav-link.active .icon-shape{background:linear-gradient(310deg,#7928ca,#ff0080)!important;box-shadow:0 3px 5px -1px rgba(121,40,202,.3)!important}
     .nav-link.active .icon-shape i{color:#fff!important;opacity:1!important}
     .icon-sm i{top:0!important;font-size:1rem!important}
-    html,body{height:100%;overflow:hidden}
-    .main-content{overflow-y:auto}
+    html,body{min-height:100%}
 
     .navbar-main{position:relative;z-index:100}
     .navbar-main .dropdown-menu{z-index:1050!important}
@@ -40,7 +41,8 @@
     .dark-mode-toggle:hover{color:#fbcf33!important}
   </style>
 </head>
-<body class="g-sidenav-show bg-gray-100 @auth{{ auth()->user()->dark_mode ? 'dark-mode' : '' }}@endauth">
+<body class="bg-gray-100 @auth workspace {{ auth()->user()->dark_mode ? 'dark-mode' : '' }}@endauth">
+  @auth<a class="skip-to-content" href="#main-content">Přejít k obsahu</a>@endauth
   @auth
     @yield('auth')
   @endauth
@@ -93,7 +95,7 @@
     @endif
   </script>
   <!-- Control Center for Soft Dashboard -->
-  <script src="{{ asset('assets/js/soft-ui-dashboard.min.js') }}?v=1.0.3"></script>
+  <script src="{{ asset('js/workspace.js') }}?v={{ file_exists(public_path('js/workspace.js')) ? filemtime(public_path('js/workspace.js')) : '1' }}" defer></script>
   @stack('scripts')
 </body>
 </html>

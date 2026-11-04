@@ -16,8 +16,10 @@ class SupportPlanController extends Controller
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
-        $query = SupportPlan::with('client');
+        $query = SupportPlan::with(['client', 'project']);
         VisibilityScope::supportPlans($query, $user);
+        if ($request->filled('client_id')) $query->where('client_id', $request->integer('client_id'));
+        if ($request->boolean('expiring')) $query->expiringSoon(30);
 
         if ($search = $request->q) {
             $query->where(fn ($q) =>
@@ -56,7 +58,13 @@ class SupportPlanController extends Controller
         $this->authorize('create', SupportPlan::class);
         $clients = Client::orderBy('name')->get();
         $selectedClient = $request->client_id ? Client::find($request->client_id) : null;
-        return view('crm.support-plans.create', compact('clients', 'selectedClient'));
+        $projects = \App\Models\Project::orderBy('name')->get();
+        $renewal = $request->renew_from ? SupportPlan::findOrFail($request->renew_from) : null;
+        if ($renewal) {
+            $this->authorize('view', $renewal);
+            $selectedClient = $renewal->client;
+        }
+        return view('crm.support-plans.create', compact('clients', 'selectedClient', 'projects', 'renewal'));
     }
 
     public function store(SupportPlanRequest $request)
@@ -74,7 +82,7 @@ class SupportPlanController extends Controller
     public function show(SupportPlan $supportPlan)
     {
         $this->authorize('view', $supportPlan);
-        $supportPlan->load(['client', 'creator']);
+        $supportPlan->load(['client', 'creator', 'project']);
         return view('crm.support-plans.show', compact('supportPlan'));
     }
 
@@ -82,7 +90,8 @@ class SupportPlanController extends Controller
     {
         $this->authorize('update', $supportPlan);
         $clients = Client::orderBy('name')->get();
-        return view('crm.support-plans.edit', compact('supportPlan', 'clients'));
+        $projects = \App\Models\Project::orderBy('name')->get();
+        return view('crm.support-plans.edit', compact('supportPlan', 'clients', 'projects'));
     }
 
     public function update(SupportPlanRequest $request, SupportPlan $supportPlan)

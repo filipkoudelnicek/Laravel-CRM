@@ -15,10 +15,7 @@ class InvoicePolicy
     public function view(User $user, Invoice $invoice): bool
     {
         if ($user->isAdmin()) return true;
-        // member can see invoices for projects they're assigned to
-        if ($invoice->project_id) {
-            return $invoice->project->hasUser($user->id);
-        }
+        // Invoices are client records; the optional project is only context.
         return $invoice->client->projects()
             ->whereHas('users', fn ($q) => $q->where('user_id', $user->id))
             ->exists();

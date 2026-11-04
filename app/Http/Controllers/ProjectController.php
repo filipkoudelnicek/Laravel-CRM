@@ -66,17 +66,19 @@ class ProjectController extends Controller
         return redirect()->route('projects.show', $project)->with('success', 'Projekt vytvořen.');
     }
 
-    public function show(Project $project)
+    public function show(Request $request, Project $project)
     {
         $this->authorize('view', $project);
-        $project->load(['client', 'users', 'tasks' => fn ($q) => $q->orderByDesc('created_at')]);
+        $project->load(['client', 'users', 'supportPlans', 'tasks' => fn ($q) => $q->with(['assignees', 'timeEntries.createdBy'])->orderByDesc('created_at')]);
+        $notes = $project->notes()->with('user')->paginate(15, ['*'], 'notes_page')->withQueryString();
+        $tab = in_array($request->tab, ['tasks', 'notes', 'time', 'overview']) ? $request->tab : 'tasks';
 
         $finance = [
             'invoicedTotal' => (float) $project->invoices()->sum('total'),
         ];
 
         $allUsers = User::orderBy('name')->get();
-        return view('crm.projects.show', compact('project', 'allUsers', 'finance'));
+        return view('crm.projects.show', compact('project', 'allUsers', 'finance', 'notes', 'tab'));
     }
 
     public function edit(Project $project)

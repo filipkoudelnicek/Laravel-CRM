@@ -57,7 +57,7 @@ class CrmTest extends TestCase
     // Test 1 – Member is forbidden from viewing a project they are NOT assigned to
     // ──────────────────────────────────────────────────────────────────────────
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function member_cannot_view_project_they_are_not_assigned_to(): void
     {
         $admin  = $this->makeAdmin();
@@ -77,7 +77,7 @@ class CrmTest extends TestCase
     // Test 2 – Member CAN post a comment on a task in a project they belong to
     // ──────────────────────────────────────────────────────────────────────────
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function member_can_create_comment_on_accessible_task(): void
     {
         $admin  = $this->makeAdmin();
@@ -106,7 +106,7 @@ class CrmTest extends TestCase
     // Test 3 – @mention creates a comment_mentions record AND sends a DB notification
     // ──────────────────────────────────────────────────────────────────────────
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function mention_in_comment_creates_record_and_sends_notification(): void
     {
         Notification::fake();
@@ -147,7 +147,7 @@ class CrmTest extends TestCase
     //          access succeeds and is audit-logged
     // ──────────────────────────────────────────────────────────────────────────
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function password_reveal_is_blocked_and_logs_authorised_access(): void
     {
         $admin     = $this->makeAdmin();

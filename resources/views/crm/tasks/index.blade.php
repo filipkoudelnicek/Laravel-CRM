@@ -23,6 +23,8 @@
         
         {{-- Filters --}}
         <form method="GET" action="{{ route('tasks.index') }}" class="row g-2">
+          @if(request('project_id'))<input type="hidden" name="project_id" value="{{ request('project_id') }}">@endif
+          <div class="col-auto d-flex align-items-center"><label class="text-sm d-flex gap-2 align-items-center"><input type="checkbox" name="mine" value="1" @checked(request()->boolean('mine'))>Jen moje úkoly</label></div>
           <div class="col-auto">
             <input type="text" name="q" value="{{ request('q') }}" 
                    class="form-control form-control-sm" placeholder="Hledat úkol…">
@@ -43,7 +45,8 @@
               @endforeach
             </select>
           </div>
-          @if(request()->hasAny(['q','status','priority']))
+          <div class="col-auto"><button type="submit" class="btn btn-outline-primary btn-sm">Filtrovat</button></div>
+          @if(request()->hasAny(['q','status','priority','mine','project_id']))
             <div class="col-auto">
               <a href="{{ route('tasks.index') }}" class="btn btn-outline-secondary btn-sm">
                 <i class="fas fa-times me-1"></i> Vymazat

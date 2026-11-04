@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\SupportPlan;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class SupportPlanRequest extends FormRequest
 {
@@ -15,7 +16,9 @@ class SupportPlanRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'client_id'   => 'required|exists:clients,id',
+            'client_id'   => 'required|integer|exists:clients,id',
+            'project_id'  => ['nullable', 'integer', Rule::exists('projects', 'id')->where('client_id', $this->input('client_id'))],
+            'paid_at'     => 'nullable|date',
             'title'       => 'required|string|max:255',
             'price'       => 'required|numeric|min:0',
             'currency'    => 'required|string|size:3',

@@ -60,9 +60,9 @@ class ClientController extends Controller
     {
         $this->authorize('view', $client);
         $client->load([
-            'projects' => fn ($q) => $q->withCount('tasks')->latest(),
+            'projects' => fn ($q) => VisibilityScope::projects($q->getQuery(), auth()->user())->withCount('tasks')->latest(),
             'invoices' => fn ($q) => $q->latest()->limit(5),
-            'supportPlans' => fn ($q) => $q->active()->orderBy('period_to'),
+            'supportPlans' => fn ($q) => $q->with('project')->orderByDesc('period_to'),
         ]);
 
         $finance = [
@@ -71,7 +71,11 @@ class ClientController extends Controller
             'totalOutstanding' => (float) $client->invoices()->whereIn('status', ['sent', 'overdue'])->sum('total'),
         ];
 
-        return view('crm.clients.show', compact('client', 'finance'));
+        $invoiceTotals = $client->invoices()->get()->groupBy('currency')->map(fn ($rows) => [
+            'invoiced' => $rows->where('status', '!=', 'cancelled')->sum('total'),
+            'paid' => $rows->where('status', 'paid')->sum('total'),
+        ]);
+        return view('crm.clients.show', compact('client', 'finance', 'invoiceTotals'));
     }
 
     public function edit(Client $client)

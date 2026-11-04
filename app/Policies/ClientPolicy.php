@@ -17,7 +17,7 @@ class ClientPolicy
 
     public function view(User $user, Client $client): bool
     {
-        if ($user->isAdmin()) return true;
+        if ($user->isAdmin() || $client->created_by === $user->id) return true;
         return $client->projects()->whereHas('users', fn ($q) => $q->where('user_id', $user->id))->exists();
     }
 
@@ -28,13 +28,13 @@ class ClientPolicy
 
     public function update(User $user, Client $client): bool
     {
-        if ($user->isAdmin()) return true;
+        if ($user->isAdmin() || $client->created_by === $user->id) return true;
         return $client->projects()->whereHas('users', fn ($q) => $q->where('user_id', $user->id))->exists();
     }
 
     public function delete(User $user, Client $client): bool
     {
-        if ($user->isAdmin()) return true;
+        if ($user->isAdmin() || $client->created_by === $user->id) return true;
         return $client->projects()->whereHas('users', fn ($q) => $q->where('user_id', $user->id))->exists();
     }
 }

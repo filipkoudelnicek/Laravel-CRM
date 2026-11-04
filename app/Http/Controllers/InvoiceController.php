@@ -18,6 +18,7 @@ class InvoiceController extends Controller
         $user = auth()->user();
 
         $query = Invoice::with(['client', 'project']);
+        if ($request->filled('client_id')) $query->where('client_id', $request->integer('client_id'));
         VisibilityScope::invoices($query, $user);
 
         if ($search = $request->q) {
@@ -36,6 +37,14 @@ class InvoiceController extends Controller
         // Summary stats (respect visibility for non-admin users)
         $statsQuery = Invoice::query();
         VisibilityScope::invoices($statsQuery, $user);
+        if ($request->filled('client_id')) $statsQuery->where('client_id', $request->integer('client_id'));
+
+        $totalsByCurrency = $statsQuery->get()->groupBy('currency')->map(fn ($rows) => [
+            'outstanding' => $rows->whereIn('status', ['sent', 'overdue'])->sum('total'),
+            'paidMonth' => $rows->where('status', 'paid')->filter(fn ($invoice) =>
+                $invoice->paid_at?->format('Y-m') === now()->format('Y-m'))->sum('total'),
+        ]);
+        $clients = VisibilityScope::clients(Client::query(), $user)->orderBy('name')->get();
 
         $totalOutstanding = (clone $statsQuery)
             ->whereIn('status', ['sent', 'overdue'])
@@ -47,7 +56,7 @@ class InvoiceController extends Controller
             ->whereYear('paid_at', now()->year)
             ->sum('total');
 
-        return view('crm.invoices.index', compact('invoices', 'totalOutstanding', 'totalPaidMonth'));
+        return view('crm.invoices.index', compact('invoices', 'totalsByCurrency', 'clients'));
     }
 
     public function create(Request $request)
@@ -60,6 +69,7 @@ class InvoiceController extends Controller
 
         $selectedClient  = $request->client_id ? Client::find($request->client_id) : null;
         $selectedProject = $request->project_id ? Project::find($request->project_id) : null;
+        $selectedClient ??= $selectedProject?->client;
 
         return view('crm.invoices.create', compact('clients', 'projects', 'nextNumber', 'selectedClient', 'selectedProject'));
     }

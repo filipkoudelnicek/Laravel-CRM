@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var editors = new Map();
 
   function initEditor(textarea) {
-    if (!textarea || editors.has(textarea)) {
+    if (!textarea || editors.has(textarea) || typeof ClassicEditor === 'undefined') {
       return;
     }
 

@@ -22,9 +22,10 @@ class RichTextSanitizer
 
         $wrapped = '<div>' . $clean . '</div>';
         $dom = new \DOMDocument('1.0', 'UTF-8');
-        libxml_use_internal_errors(true);
+        $previousErrors = libxml_use_internal_errors(true);
         $dom->loadHTML('<?xml encoding="utf-8" ?>' . $wrapped, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
         libxml_clear_errors();
+        libxml_use_internal_errors($previousErrors);
 
         $allowedAttributes = [
             'a' => ['href', 'target', 'rel'],
@@ -78,8 +79,11 @@ class RichTextSanitizer
             }
         }
 
-        $result = $dom->saveHTML();
-        $result = preg_replace('#^<div>|</div>$#', '', $result ?? '') ?? '';
+        $result = '';
+        $root = $dom->getElementsByTagName('div')->item(0);
+        if ($root) {
+            foreach ($root->childNodes as $child) $result .= $dom->saveHTML($child);
+        }
 
         return trim($result) === '' ? null : $result;
     }
@@ -91,7 +95,7 @@ class RichTextSanitizer
 
     private static function isSafeHref(string $href): bool
     {
-        $href = trim($href);
+        $href = preg_replace('/[\x00-\x20\x7f]+/', '', html_entity_decode($href, ENT_QUOTES | ENT_HTML5, 'UTF-8')) ?? '';
         if ($href === '') {
             return false;
         }

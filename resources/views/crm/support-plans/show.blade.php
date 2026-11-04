@@ -1,59 +1,6 @@
 @extends('layouts.user_type.auth')
-
+@section('title', $supportPlan->title)
 @section('content')
-<div class="row">
-  <div class="col-lg-8">
-    <div class="card mb-4">
-      <div class="card-header pb-0 d-flex justify-content-between align-items-center">
-        <div>
-          <h5 class="mb-0">{{ $supportPlan->title }}</h5>
-          @php $statusColors = ['active'=>'success','expired'=>'secondary','cancelled'=>'dark']; @endphp
-          @php $spStatusLabels = ['active'=>'Aktivní','expired'=>'Vypršelo','cancelled'=>'Zrušeno']; @endphp
-          <span class="badge bg-gradient-{{ $statusColors[$supportPlan->status] ?? 'secondary' }} mt-1">{{ $spStatusLabels[$supportPlan->status] ?? ucfirst($supportPlan->status) }}</span>
-          @if($supportPlan->isExpiringSoon())
-            <span class="badge bg-gradient-warning mt-1"><i class="fas fa-exclamation-circle me-1"></i>Expiruje brzy</span>
-          @endif
-        </div>
-        <div class="d-flex gap-2">
-          @can('update', $supportPlan)
-            <a href="{{ route('support-plans.edit', $supportPlan) }}" class="btn btn-outline-secondary btn-sm">Upravit</a>
-          @endcan
-          @can('delete', $supportPlan)
-            <form method="POST" action="{{ route('support-plans.destroy', $supportPlan) }}" onsubmit="return confirm('Smazat plán?')">
-              @csrf @method('DELETE')
-              <button class="btn btn-outline-danger btn-sm">Smazat</button>
-            </form>
-          @endcan
-        </div>
-      </div>
-      <div class="card-body pt-2">
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item ps-0 border-0">
-            <small class="text-secondary">Klient</small><br>
-            <a href="{{ route('clients.show', $supportPlan->client) }}" class="font-weight-bold text-dark">{{ $supportPlan->client->name }}</a>
-          </li>
-          <li class="list-group-item ps-0 border-0">
-            <small class="text-secondary">Cena</small><br>
-            <strong>{{ number_format($supportPlan->price, 2, ',', ' ') }} {{ $supportPlan->currency }}</strong>
-          </li>
-          <li class="list-group-item ps-0 border-0">
-            <small class="text-secondary">Období</small><br>
-            {{ $supportPlan->period_from->format('d.m.Y') }} – {{ $supportPlan->period_to->format('d.m.Y') }}
-          </li>
-          @if($supportPlan->notes)
-          <li class="list-group-item ps-0 border-0">
-            <small class="text-secondary">Poznámky</small><br>
-            {{ $supportPlan->notes }}
-          </li>
-          @endif
-          <li class="list-group-item ps-0 border-0">
-            <small class="text-secondary">Vytvořil</small><br>
-            {{ $supportPlan->creator?->name ?? '—' }}
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>
+<div class="workspace-heading"><div><a href="{{ route('clients.show', $supportPlan->client) }}" class="context-line">{{ $supportPlan->client->name }}</a><h1>{{ $supportPlan->title }}</h1></div><div class="d-flex gap-2 flex-wrap">@can('update', $supportPlan)<a class="btn btn-outline-secondary" href="{{ route('support-plans.edit', $supportPlan) }}">Upravit</a>@endcan @can('create', \App\Models\SupportPlan::class)<a class="btn btn-primary" href="{{ route('support-plans.create', ['renew_from' => $supportPlan->id]) }}">Prodloužit službu</a>@endcan</div></div>
+<section class="card work-panel"><header class="panel-heading"><div><h2>Platnost a úhrada</h2><p>Prodloužením vznikne nové období a historie zůstane zachovaná.</p></div></header><div class="p-4"><dl class="row"><dt class="col-sm-4 mb-3">Období</dt><dd class="col-sm-8">{{ $supportPlan->period_from->format('j. n. Y') }} – {{ $supportPlan->period_to->format('j. n. Y') }} (včetně)</dd><dt class="col-sm-4 mb-3">Cena za období</dt><dd class="col-sm-8">{{ number_format($supportPlan->price,2,',',' ') }} {{ $supportPlan->currency }}</dd><dt class="col-sm-4 mb-3">Úhrada</dt><dd class="col-sm-8 {{ $supportPlan->paid_at ? 'text-success' : 'text-secondary' }}">{{ $supportPlan->paid_at ? 'Uhrazeno ' . $supportPlan->paid_at->format('j. n. Y') : 'Úhrada zatím není evidovaná' }}</dd><dt class="col-sm-4 mb-3">Stav služby</dt><dd class="col-sm-8">{{ $supportPlan->status === 'cancelled' ? 'Zrušená' : ($supportPlan->status === 'expired' || $supportPlan->period_to->toDateString() < now(config('app.display_timezone'))->toDateString() ? 'Ukončená' : ($supportPlan->period_from->toDateString() > now(config('app.display_timezone'))->toDateString() ? 'Naplánovaná' : 'Aktivní')) }}</dd>@if($supportPlan->project)<dt class="col-sm-4 mb-3">Projekt</dt><dd class="col-sm-8"><a href="{{ route('projects.show', $supportPlan->project) }}">{{ $supportPlan->project->name }}</a></dd>@endif</dl>@if($supportPlan->notes)<h3>Poznámky</h3><p class="note-body">{{ $supportPlan->notes }}</p>@endif</div></section>
 @endsection
-

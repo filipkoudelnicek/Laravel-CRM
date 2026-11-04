@@ -14,14 +14,14 @@ class TimeEntryController extends Controller
 
         $data = $request->validate([
             'started_at' => 'required|date_format:Y-m-d\TH:i',
-            'ended_at'   => 'nullable|date_format:Y-m-d\TH:i|after_or_equal:started_at',
+            'ended_at'   => 'required|date_format:Y-m-d\TH:i|after_or_equal:started_at',
             'notes'      => 'nullable|string|max:500',
         ]);
 
         // Convert from ISO 8601 to database format
-        $data['started_at'] = str_replace('T', ' ', $data['started_at']);
+        $data['started_at'] = \Carbon\Carbon::createFromFormat('!Y-m-d\TH:i', $data['started_at'], config('app.display_timezone'))->utc();
         if ($data['ended_at']) {
-            $data['ended_at'] = str_replace('T', ' ', $data['ended_at']);
+            $data['ended_at'] = \Carbon\Carbon::createFromFormat('!Y-m-d\TH:i', $data['ended_at'], config('app.display_timezone'))->utc();
         }
 
         $data['task_id'] = $task->id;
@@ -34,18 +34,19 @@ class TimeEntryController extends Controller
 
     public function update(Request $request, Task $task, TimeEntry $timeEntry)
     {
+        abort_unless($timeEntry->task_id === $task->id, 404);
         $this->authorize('update', $timeEntry);
 
         $data = $request->validate([
             'started_at' => 'required|date_format:Y-m-d\TH:i',
-            'ended_at'   => 'nullable|date_format:Y-m-d\TH:i|after_or_equal:started_at',
+            'ended_at'   => 'required|date_format:Y-m-d\TH:i|after_or_equal:started_at',
             'notes'      => 'nullable|string|max:500',
         ]);
 
         // Convert from ISO 8601 to database format
-        $data['started_at'] = str_replace('T', ' ', $data['started_at']);
+        $data['started_at'] = \Carbon\Carbon::createFromFormat('!Y-m-d\TH:i', $data['started_at'], config('app.display_timezone'))->utc();
         if ($data['ended_at']) {
-            $data['ended_at'] = str_replace('T', ' ', $data['ended_at']);
+            $data['ended_at'] = \Carbon\Carbon::createFromFormat('!Y-m-d\TH:i', $data['ended_at'], config('app.display_timezone'))->utc();
         }
 
         $timeEntry->update($data);
@@ -55,6 +56,7 @@ class TimeEntryController extends Controller
 
     public function destroy(Task $task, TimeEntry $timeEntry)
     {
+        abort_unless($timeEntry->task_id === $task->id, 404);
         $this->authorize('delete', $timeEntry);
 
         $timeEntry->delete();

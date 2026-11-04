@@ -18,6 +18,8 @@ class TaskController extends Controller
         $user = auth()->user();
 
         $query = Task::with(['project.client', 'assignees']);
+        if ($request->boolean('mine')) $query->whereHas('assignees', fn ($q) => $q->where('users.id', $user->id));
+        if ($request->filled('project_id')) $query->where('project_id', $request->integer('project_id'));
 
         if (!$user->isAdmin()) {
             $query->whereHas('project.users', fn ($q) => $q->where('user_id', $user->id));

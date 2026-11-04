@@ -1,7 +1,7 @@
 @props(['title', 'submitText' => 'Uložit', 'backUrl'])
 
-<div class="row justify-content-center">
-  <div class="col-lg-8 col-xl-7">
+<div class="row justify-content-center form-page">
+  <div class="col-12">
     <div class="card mb-4">
       <div class="card-header pb-3 pt-3">
         <div class="d-flex justify-content-between align-items-center">
