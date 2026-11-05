@@ -1,7 +1,7 @@
 @extends('layouts.user_type.auth')
 
 @section('content')
-<x-form-layout 
+<x-form-layout tone="work"
   title="Upravit projekt: {{ $project->name }}" 
   submitText="Uložit změny"
   backUrl="{{ route('projects.show', $project) }}">

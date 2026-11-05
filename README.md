@@ -23,6 +23,8 @@ projektové poznámky, úkoly, komentáře, čas a období klientských služeb.
 - Světlý a tmavý vzhled, mobilní navigace a ovládání klávesnicí.
 - Kompaktní seznamy s jednou nabídkou akcí na řádek. Název otevírá detail,
   stav úkolu lze změnit přímo v seznamu. Pohledy a řazení zůstávají v URL.
+  Odkaz pokrývá celou buňku s názvem a kontextem záznamu, včetně prázdné
+  plochy; funguje i otevření do nové záložky a ovládání klávesnicí.
 - Detail klienta rozdělený na projekty, služby a faktury s kontaktem vedle obsahu.
 
 ## Technologie a požadavky
@@ -133,6 +135,8 @@ rozbalené. Ve formuláři úkolu se kolegové vybírají zaškrtávacími polí
 Filtry a tabulky mají oddělené plochy ve všech seznamech. Práce, služby,
 finance a poznámky používají jemné podbarvení v obou motivech. Úvodní
 `/dashboard` obsahuje nástěnku; osobní pracovní přehled zůstává na `/my-work`.
+Vytváření i úpravy klientů, projektů, úkolů, faktur, služeb, přístupů a
+uživatelů používají stejné podbarvené panely s oddělenými závěrečnými akcemi.
 
 Písmo Manrope je dodané místně v `public/fonts`, včetně SIL Open Font License.
 Načítání písma nevyžaduje Google Fonts. Rozložení a inspirace jsou popsané

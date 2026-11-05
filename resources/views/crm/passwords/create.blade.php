@@ -27,12 +27,10 @@
 
     <div class="row">
       <div class="col-md-6">
-        <label class="form-label">Heslo <span class="text-danger">*</span></label>
+        <label class="form-label" for="pw-field">Heslo <span class="text-danger">*</span></label>
         <div class="input-group">
           <input type="password" name="password" id="pw-field" class="form-control @error('password') is-invalid @enderror" required autocomplete="new-password">
-          <button type="button" class="btn btn-outline-secondary" onclick="togglePw()">
-            <i class="fas fa-eye" id="pw-eye"></i>
-          </button>
+          <button type="button" id="pw-toggle" class="btn btn-outline-secondary" onclick="togglePw()" aria-controls="pw-field" aria-pressed="false">Zobrazit</button>
         </div>
         @error('password') <div class="text-danger text-xs mt-1">{{ $message }}</div> @enderror
       </div>
@@ -75,9 +73,11 @@
 <script>
 function togglePw() {
   const f = document.getElementById('pw-field');
-  const e = document.getElementById('pw-eye');
-  if (f.type === 'password') { f.type = 'text'; e.classList.replace('fa-eye','fa-eye-slash'); }
-  else { f.type = 'password'; e.classList.replace('fa-eye-slash','fa-eye'); }
+  const button = document.getElementById('pw-toggle');
+  const show = f.type === 'password';
+  f.type = show ? 'text' : 'password';
+  button.textContent = show ? 'Skrýt' : 'Zobrazit';
+  button.setAttribute('aria-pressed', String(show));
 }
 
 function updateTypeFields() {

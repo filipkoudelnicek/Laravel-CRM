@@ -1,7 +1,7 @@
 @extends('layouts.user_type.auth')
 
 @section('content')
-<x-form-layout 
+<x-form-layout tone="work"
   title="Nový projekt" 
   submitText="Vytvořit projekt"
   backUrl="{{ route('projects.index') }}">

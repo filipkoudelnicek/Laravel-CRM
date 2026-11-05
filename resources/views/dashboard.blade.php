@@ -8,7 +8,7 @@
 <form class="dashboard-filters" method="GET">
   <label>Období<select name="months" class="form-select" aria-label="Období">@foreach([6,12,24] as $length)<option value="{{ $length }}" @selected($months===$length)>{{ $length }} měsíců</option>@endforeach</select></label>
   <label>Měna faktur<select name="currency" class="form-select" aria-label="Měna faktur">@foreach($currencies as $option)<option value="{{ $option }}" @selected($currency===$option)>{{ $option }}</option>@endforeach</select></label>
-  <button class="btn btn-outline-secondary">Použít</button>
+  <button class="btn btn-outline-secondary dashboard-filter-submit">Použít</button>
   <a class="dashboard-work-link" href="{{ route('work.index') }}">Přejít na moji práci <x-icon name="arrow" /></a>
 </form>
 <div class="dashboard-metrics">
