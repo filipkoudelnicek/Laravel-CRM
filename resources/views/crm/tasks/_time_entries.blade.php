@@ -1,6 +1,7 @@
 @props(['task'])
 <section class="card work-panel mb-4">
   <header class="panel-heading"><div><h2>Odpracovaný čas</h2><p>{{ intdiv((int)$task->timeEntries->sum(fn($e) => $e->duration_in_minutes ?? 0),60) }} h {{ (int)$task->timeEntries->sum(fn($e) => $e->duration_in_minutes ?? 0) % 60 }} min celkem</p></div></header>
+  @if($showControls ?? true)
   <div class="p-3 d-flex gap-2 flex-wrap">
     @if(!$activeTimer)
     <form method="POST" action="{{ route('tasks.timer.start', $task) }}">@csrf<button class="btn btn-primary btn-sm" type="submit">Spustit časovač</button></form>
@@ -11,11 +12,20 @@
     @endif
     <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#timeEntryModal">Zapsat ručně</button>
   </div>
+  @else
+  <div class="time-manual-action"><button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#timeEntryModal">Zapsat ručně</button></div>
+  @endif
+  <div class="time-history">
   @forelse($task->timeEntries as $entry)
   @php $localStart = $entry->started_at->copy()->timezone(config('app.display_timezone')); $localEnd = $entry->ended_at?->copy()->timezone(config('app.display_timezone')); @endphp
-  <div class="work-row"><span class="row-content"><strong>{{ $entry->createdBy?->name }}</strong><small>{{ $localStart->format('j. n. Y H:i') }}@if($entry->notes) · {{ $entry->notes }}@endif</small></span><strong>{{ $entry->duration_formatted }}</strong>
+  <div class="time-entry">
+    <div class="time-entry-heading"><strong>{{ $entry->createdBy?->name }}</strong><strong class="numeric">{{ $entry->duration_formatted }}</strong></div>
+    <div class="time-entry-meta"><span class="numeric">{{ $localStart->format('j. n. Y H:i') }}</span>
   @can('update', $entry)@if($entry->ended_at)<button type="button" class="btn btn-link p-0 m-0 text-sm" data-time-edit data-update-url="{{ route('tasks.time-entries.update', [$task,$entry]) }}" data-delete-url="{{ route('tasks.time-entries.destroy', [$task,$entry]) }}" data-start="{{ $localStart->format('Y-m-d\TH:i') }}" data-end="{{ $localEnd->format('Y-m-d\TH:i') }}" data-notes="{{ $entry->notes }}">Upravit</button>@endif @endcan</div>
+    @if($entry->notes)<p title="{{ $entry->notes }}">{{ $entry->notes }}</p>@endif
+  </div>
   @empty<div class="empty-work compact"><p>Spusťte časovač při práci nebo zapište hotovou práci ručně.</p></div>@endforelse
+  </div>
 </section>
 @push('scripts')
 <script>

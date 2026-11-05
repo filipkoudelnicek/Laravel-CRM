@@ -1,70 +1,12 @@
 @extends('layouts.user_type.auth')
-
+@section('title','Nový úkol')
 @section('content')
-<x-form-layout 
-  title="Nový úkol" 
-  submitText="Vytvořit úkol"
-  backUrl="{{ route('tasks.index') }}">
-  
-  <form method="POST" action="{{ route('tasks.store') }}" enctype="multipart/form-data">
-    @csrf
-
-    <x-form-field name="title" label="Název" placeholder="Např. Implementovat login" required />
-
-    <div class="row">
-      <div class="col-md-6">
-        <x-form-field name="project_id" label="Projekt" type="select" required>
-          <option value="">— Vyberte projekt —</option>
-          @foreach($projects as $project)
-            <option value="{{ $project->id }}" @selected(old('project_id', $selectedProject?->id) == $project->id)>
-              {{ $project->name }} <small class="text-muted">({{ $project->client->name }})</small>
-            </option>
-          @endforeach
-        </x-form-field>
-      </div>
-      <div class="col-md-3">
-        <x-form-field name="status" label="Stav" type="select" required>
-          @foreach(['todo'=>'K řešení','in_progress'=>'Probíhá','review'=>'Ke kontrole','done'=>'Dokončeno'] as $s => $label)
-            <option value="{{ $s }}" @selected(old('status','todo') === $s)>{{ $label }}</option>
-          @endforeach
-        </x-form-field>
-      </div>
-      <div class="col-md-3">
-        <x-form-field name="priority" label="Priorita" type="select" required>
-          @foreach(['low'=>'Nízká','medium'=>'Střední','high'=>'Vysoká'] as $p => $label)
-            <option value="{{ $p }}" @selected(old('priority','medium') === $p)>{{ $label }}</option>
-          @endforeach
-        </x-form-field>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col-md-3">
-        <x-form-field name="starts_at" label="Začátek" type="date" />
-      </div>
-      <div class="col-md-3">
-        <x-form-field name="due_at" label="Termín (do)" type="date" />
-      </div>
-      <div class="col-md-6">
-        <x-form-field name="assignees[]" label="Přiřazení" type="select">
-          @foreach($allUsers as $u)
-            <option value="{{ $u->id }}" @selected(in_array($u->id, old('assignees', [])))>{{ $u->name }}</option>
-          @endforeach
-        </x-form-field>
-        <small class="text-muted">Držte Ctrl / Cmd pro vícenásobný výběr</small>
-      </div>
-    </div>
-
-    <x-form-field name="description" label="Popis" type="textarea" rows="4" inputClass="rich-editor-source" />
-
-    <x-form-field name="attachments[]" label="Přílohy / screenshoty" type="file" inputClass="form-control" multiple accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip" />
-    <small class="text-muted d-block mb-3">Max 8 souborů, každý do 10 MB.</small>
-
-    <x-form-actions submitText="Vytvořit úkol" backUrl="{{ route('tasks.index') }}" />
+<div class="form-workspace">
+  <x-page-heading title="Nový úkol" />
+  <form method="POST" action="{{ route('tasks.store') }}" enctype="multipart/form-data">@csrf
+    @include('crm.tasks._fields',['task'=>null])
+    <div class="form-actions"><a class="btn btn-outline-secondary" href="{{ $selectedProject ? route('projects.show',$selectedProject) : route('tasks.index') }}">Zrušit</a><button class="btn btn-primary">Vytvořit úkol</button></div>
   </form>
-</x-form-layout>
+</div>
 @endsection
-
-@push('scripts')
-<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
-@endpush
+@push('scripts')<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>@endpush
