@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const initializeEditor = textarea => {
         if (!window.ClassicEditor || editors.has(textarea) || initializingEditors.has(textarea)) return;
         initializingEditors.add(textarea);
+        const focusOnReady = document.activeElement === textarea;
         window.ClassicEditor.create(textarea, {
             toolbar: ['undo', 'redo', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote']
         }).then(editor => {
@@ -18,6 +19,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 editor.editing.view.focus();
                 window.showToast?.(textarea.name === 'body' ? 'Napište text komentáře.' : 'Vyplňte text pole.', 'error');
             });
+            if (focusOnReady && [textarea, document.body].includes(document.activeElement)) {
+                editor.editing.view.focus();
+            }
         }).catch(() => {
             // A failed CDN/editor initialization keeps the ordinary textarea usable.
         }).finally(() => initializingEditors.delete(textarea));
@@ -65,6 +69,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (['ArrowDown', 'ArrowUp'].includes(event.key)) {
                 event.preventDefault(); openActions(trigger, event.key === 'ArrowUp');
             }
+        });
+    });
+    document.querySelectorAll('[data-comment-edit]').forEach(button => {
+        button.addEventListener('click', () => {
+            const panel = document.getElementById(button.dataset.commentEdit);
+            closeActions();
+            if (!panel) return;
+            panel.classList.remove('d-none');
+            (panel.querySelector('.ck-editor__editable') || panel.querySelector('textarea'))?.focus();
         });
     });
     document.addEventListener('pointerdown', event => {

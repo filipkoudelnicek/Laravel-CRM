@@ -11,7 +11,6 @@
             <div class="alert alert-danger" role="alert"><strong>Údaje se nepodařilo uložit.</strong><ul class="mb-0 mt-2">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
             @endif
             @yield('content')
-            @include('layouts.footers.auth.footer')
         </div>
     </main>
     <x-confirm-dialog />

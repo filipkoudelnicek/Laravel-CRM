@@ -17,22 +17,34 @@
   @endforeach
 </nav>
 @if($tab === 'tasks')
-<section class="card work-panel">
-  <header class="panel-heading"><div><h2>Další kroky</h2><p>{{ $project->tasks->where('status', 'done')->count() }} z {{ $project->tasks->count() }} úkolů dokončeno</p></div></header>
-  @include('crm.tasks._table', ['tasks'=>$project->tasks])
+<section class="task-surface">
+  <header class="section-heading"><h2>Úkoly projektu</h2><span class="context-line">{{ $project->tasks->where('status','done')->count() }} z {{ $project->tasks->count() }} hotovo</span></header>
+  @include('crm.tasks._table', ['tasks'=>$project->tasks,'contextProject'=>true])
 </section>
 @elseif($tab === 'notes')
-<div class="notes-layout">
-  <section class="card work-panel note-composer"><header class="panel-heading"><div><h2>Zapsat domluvu</h2><p>Rozhodnutí, podklady nebo další postup</p></div></header><form class="p-4" method="POST" action="{{ route('projects.notes.store', $project) }}">@csrf<label for="project-note" class="form-label">Poznámka pro vás oba</label><textarea id="project-note" name="body" rows="6" maxlength="10000" required class="form-control" placeholder="Co potřebuje kolega vědět?">{{ old('body') }}</textarea><button class="btn btn-primary mt-3" type="submit">Přidat poznámku</button></form></section>
-  <section aria-label="Projektové poznámky">
-    @forelse($notes as $note)
-    <article class="card work-panel mb-3"><header class="panel-heading"><div class="d-flex align-items-center gap-2"><span class="person-avatar">{{ mb_substr($note->user?->name ?? 'U', 0, 1) }}</span><div><h2 class="text-sm">{{ $note->user?->name ?? 'Odstraněný uživatel' }}</h2><p>{{ $note->created_at->copy()->timezone(config('app.display_timezone'))->format('j. n. Y H:i') }}</p></div></div>@if(auth()->user()->isAdmin() || $note->user_id === auth()->id())<form method="POST" action="{{ route('projects.notes.destroy', [$project, $note]) }}" onsubmit="return confirm('Odstranit tuto poznámku?')">@csrf @method('DELETE')<button class="btn btn-link text-secondary m-0 p-0" type="submit">Odstranit</button></form>@endif</header><div class="p-4 note-body">{{ $note->body }}</div></article>
-    @empty
-    <div class="card empty-work"><h3>Všechny domluvy na jednom místě</h3><p>Zapište první poznámku. U každé zůstane autor a datum.</p></div>
-    @endforelse
-    {{ $notes->links() }}
-  </section>
-</div>
+<section class="project-notes-document">
+  <form class="project-note-composer" method="POST" action="{{ route('projects.notes.store',$project) }}">@csrf
+    <label class="form-label" for="project-note">Poznámka pro vás oba</label>
+    <textarea id="project-note" name="body" rows="4" maxlength="10000" required class="form-control" placeholder="Rozhodnutí, podklady nebo další postup…">{{ old('body') }}</textarea>
+    <div class="composer-actions"><small>Poznámku uvidí všichni členové projektu.</small><button class="btn btn-primary" type="submit">Přidat poznámku</button></div>
+  </form>
+  <div class="project-note-stream" aria-label="Projektové poznámky">
+  @forelse($notes as $note)
+    <article class="project-note-item">
+      <span class="person-avatar">{{ mb_substr($note->user?->name ?? '?',0,1) }}</span>
+      <div class="project-note-content">
+        <header class="comment-header"><strong>{{ $note->user?->name ?? 'Odstraněný uživatel' }}</strong><time datetime="{{ $note->created_at->toIso8601String() }}">{{ $note->created_at->copy()->timezone(config('app.display_timezone'))->format('j. n. Y H:i') }}</time>
+        @if(auth()->user()->isAdmin() || $note->user_id === auth()->id())<x-row-actions :label="'Poznámka od '.($note->user?->name ?? 'uživatele')"><form method="POST" action="{{ route('projects.notes.destroy',[$project,$note]) }}" data-confirm="Smazat tuto poznámku?">@csrf @method('DELETE')<button role="menuitem" class="danger-action"><x-icon name="trash" />Smazat</button></form></x-row-actions>@endif
+        </header>
+        <div class="note-body">{{ $note->body }}</div>
+      </div>
+    </article>
+  @empty
+    <div class="empty-work"><h3>Domluvy budete mít po ruce</h3><p>Zapište první poznámku. U každé zůstane autor a datum.</p></div>
+  @endforelse
+  </div>
+  {{ $notes->links() }}
+</section>
 @elseif($tab === 'time')
 <section class="card work-panel"><header class="panel-heading"><div><h2>Čas na projektu</h2><p>Celkem {{ intdiv($totalMinutes, 60) }} h {{ $totalMinutes % 60 }} min v dokončených záznamech</p></div></header>
   @forelse($entries->sortByDesc('started_at') as $entry)

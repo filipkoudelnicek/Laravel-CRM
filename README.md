@@ -120,3 +120,14 @@ Původní vizuální základ je Soft UI Dashboard Laravel od Creative Tim a
 UPDIVISION. Projekt zachovává původní licenční informace a používá jeho
 bezplatné komponenty. Nové pracovní rozhraní má vlastní styly v
 `resources/css/workspace.css`.
+
+## Vzhled pracovního prostoru
+
+Projektové portfolio, seznamy úkolů a detail se zadáním, diskuzí a jedním
+panelem vlastností mají společné styly v `resources/css/workspace.css`.
+Pokročilé filtry úkolů se otevírají na vyžádání; aktivní filtry zůstávají
+rozbalené. Ve formuláři úkolu se kolegové vybírají zaškrtávacími políčky.
+
+Písmo Manrope je dodané místně v `public/fonts`, včetně SIL Open Font License.
+Načítání písma nevyžaduje Google Fonts. Rozložení a inspirace jsou popsané
+v `DESIGN.md`. Sestavené CSS, JavaScript a font jsou součástí repozitáře.

@@ -7,6 +7,7 @@
   <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('assets/img/apple-icon.png') }}">
   <link rel="icon" type="image/png" href="{{ asset('assets/img/favicon.png') }}">
   <title>@yield('title', 'CRM') · Codencio</title>
+  @auth<link rel="preload" href="{{ asset('fonts/Manrope-Variable.ttf') }}" as="font" type="font/ttf" crossorigin>@endauth
   <!--     Fonts and icons     -->
   @guest<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />@endguest
   <!-- Nucleo Icons -->
