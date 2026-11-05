@@ -20,6 +20,9 @@ class InvoiceController extends Controller
         $query = Invoice::with(['client', 'project']);
         if ($request->filled('client_id')) $query->where('client_id', $request->integer('client_id'));
         VisibilityScope::invoices($query, $user);
+        $currencies = VisibilityScope::invoices(Invoice::query(), $user)
+            ->distinct()->orderBy('currency')->pluck('currency');
+        if ($request->filled('currency')) $query->where('currency', $request->string('currency')->toString());
 
         if ($search = $request->q) {
             $query->where(fn ($q) =>
@@ -29,7 +32,7 @@ class InvoiceController extends Controller
         }
 
         if ($status = $request->status) {
-            $query->where('status', $status);
+            $status === 'outstanding' ? $query->whereIn('status', ['sent', 'overdue']) : $query->where('status', $status);
         }
 
         $invoices = $query->orderByDesc('created_at')->paginate(20)->withQueryString();
@@ -38,6 +41,7 @@ class InvoiceController extends Controller
         $statsQuery = Invoice::query();
         VisibilityScope::invoices($statsQuery, $user);
         if ($request->filled('client_id')) $statsQuery->where('client_id', $request->integer('client_id'));
+        if ($request->filled('currency')) $statsQuery->where('currency', $request->string('currency')->toString());
 
         $totalsByCurrency = $statsQuery->get()->groupBy('currency')->map(fn ($rows) => [
             'outstanding' => $rows->whereIn('status', ['sent', 'overdue'])->sum('total'),
@@ -46,17 +50,7 @@ class InvoiceController extends Controller
         ]);
         $clients = VisibilityScope::clients(Client::query(), $user)->orderBy('name')->get();
 
-        $totalOutstanding = (clone $statsQuery)
-            ->whereIn('status', ['sent', 'overdue'])
-            ->sum('total');
-
-        $totalPaidMonth = (clone $statsQuery)
-            ->where('status', 'paid')
-            ->whereMonth('paid_at', now()->month)
-            ->whereYear('paid_at', now()->year)
-            ->sum('total');
-
-        return view('crm.invoices.index', compact('invoices', 'totalsByCurrency', 'clients'));
+        return view('crm.invoices.index', compact('invoices', 'totalsByCurrency', 'clients', 'currencies'));
     }
 
     public function create(Request $request)

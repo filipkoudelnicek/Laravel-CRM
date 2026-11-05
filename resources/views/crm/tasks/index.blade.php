@@ -24,7 +24,9 @@
       </div>
     </details>
   </form>
+  <div class="task-table-panel">
   @include('crm.tasks._table', ['tasks'=>$tasks])
   <x-list-footer :items="$tasks" />
+  </div>
 </section>
 @endsection

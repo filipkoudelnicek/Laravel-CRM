@@ -20,7 +20,7 @@
       </div>
       @endif
     </section>
-    <section class="document-section" aria-label="Komentáře k úkolu">
+    <section class="document-section discussion-panel" aria-label="Komentáře k úkolu">
       <header class="section-heading"><h2>Komentáře <span class="text-secondary">{{ $commentCount }}</span></h2></header>
       <form id="comment-form" class="comment-composer" method="POST" action="{{ route('tasks.comments.store',$task) }}" enctype="multipart/form-data">
         @csrf

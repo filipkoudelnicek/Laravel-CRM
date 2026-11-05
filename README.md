@@ -5,7 +5,9 @@ projektové poznámky, úkoly, komentáře, čas a období klientských služeb.
 
 ## Co aplikace umí
 
-- Nástěnka s vlastními úkoly, termíny, týdenním časem a končícími službami.
+- Nástěnka s měsíčními příjmy, stavy úkolů, posledními fakturami a službami.
+  Období lze přepnout na 6, 12 nebo 24 měsíců, částky se počítají po měnách.
+- Moje práce s vlastními úkoly, termíny, týdenním časem a končícími službami.
 - Klient se svými projekty, službami a fakturami.
 - Projektové poznámky s autorem a datem; přístup podle členství v projektu.
 - Úkoly, přiřazení kolegů, komentáře, zmínky a přílohy.
@@ -115,6 +117,7 @@ composer audit
 
 Testy ověřují přístupová práva, klienta a projekt na faktuře, projektové
 poznámky, časovače dvou lidí, ruční čas a prodlužování období služeb.
+Nástěnka má testy měnových součtů, období, prázdných stavů a viditelnosti dat.
 
 Původní vizuální základ je Soft UI Dashboard Laravel od Creative Tim a
 UPDIVISION. Projekt zachovává původní licenční informace a používá jeho
@@ -127,6 +130,9 @@ Projektové portfolio, seznamy úkolů a detail se zadáním, diskuzí a jedním
 panelem vlastností mají společné styly v `resources/css/workspace.css`.
 Pokročilé filtry úkolů se otevírají na vyžádání; aktivní filtry zůstávají
 rozbalené. Ve formuláři úkolu se kolegové vybírají zaškrtávacími políčky.
+Filtry a tabulky mají oddělené plochy ve všech seznamech. Práce, služby,
+finance a poznámky používají jemné podbarvení v obou motivech. Úvodní
+`/dashboard` obsahuje nástěnku; osobní pracovní přehled zůstává na `/my-work`.
 
 Písmo Manrope je dodané místně v `public/fonts`, včetně SIL Open Font License.
 Načítání písma nevyžaduje Google Fonts. Rozložení a inspirace jsou popsané
