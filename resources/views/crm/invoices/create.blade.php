@@ -1,7 +1,7 @@
 @extends('layouts.user_type.auth')
 
 @section('content')
-<x-form-layout 
+<x-form-layout tone="finance"
   title="Nová faktura" 
   submitText="Vytvořit fakturu"
   backUrl="{{ route('invoices.index') }}">
@@ -89,7 +89,7 @@
           <input type="text" name="items[{{ $i }}][description]" value="{{ $item['description'] ?? '' }}" class="form-control form-control-sm" placeholder="…">
         </div>
         <div class="col-md-1 mb-2 text-center">
-          <button type="button" class="btn btn-outline-danger btn-sm remove-item" title="Odebrat"><i class="fas fa-trash"></i></button>
+          <button type="button" class="btn btn-outline-danger btn-sm remove-item" title="Odebrat položku" aria-label="Odebrat položku"><x-icon name="trash" /></button>
         </div>
       </div>
       @endforeach

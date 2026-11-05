@@ -87,3 +87,31 @@ motivech, filtry nástěnky, přechod na neuhrazené faktury a nabídky akcí be
 změny výšky řádku. Nástěnka, Moje práce, seznamy a hlavní detaily nemají
 vodorovné přetékání při 320, 390, 768 a 1024 px. Vizuální kontrola zahrnuje
 desktop i mobil.
+
+## Formuláře a klikací plocha záznamů
+
+Navazující zadání: sjednotit vytvářecí formuláře s podbarvenými přehledy,
+zarovnat filtr nástěnky a zvětšit klikací část tabulkového řádku.
+Zachová se místní Manrope, text #252631, bílá pole #FFFFFF a akce #6156CE.
+Formulář dostane podle obsahu neutrální #F6F6F9, pracovní #F2F0FB,
+finanční #F1F5FC nebo servisní #EEF6F1 panel a vlastní tmavý protějšek.
+
+Uspořádání: nadpis nad panelem, pole zarovnaná vlevo, závěrečné akce
+oddělené linkou. Úkol ponechá zadání vlevo a nastavení vpravo, na mobilu
+pod sebou. Filtr nástěnky srovná spodní hrany obou selectů a tlačítka.
+Celá buňka s názvem a kontextem bude skutečný odkaz; ostatní ovládání
+zůstane samostatně. Zachová se klávesnice, prostřední tlačítko i Ctrl/Cmd.
+
+Přezkoumání: rozsah odpovídá konkrétním nedostatkům současného CRM.
+Podklady navazují na rozlišení práce, financí a služeb; nepřidávají se nové
+dekorace ani složité ovládání klikacího řádku pomocí JavaScriptu.
+
+Ověření: sestavení produkčních stylů, kompilace Blade a 27 Laravel testů
+(172 kontrol). Všech 14 formulářů pro vytvoření/úpravu prošlo světlým
+i tmavým režimem při 320, 390, 768, 1024 a 1440 px bez vodorovného
+přetékání. Filtr nástěnky má změřené shodné výšky ovládání a zarovnání
+spodních hran na desktopu. Kliknutí do prázdné části buňky, Enter,
+Ctrl+kliknutí a prostřední tlačítko otevírají správný záznam. Stav úkolu,
+nabídka akcí a kontaktní odkazy fungují samostatně. Prohlížeč ověřil také
+validaci a uložení uživatele, zachování hesla při úpravě, přepínání
+viditelnosti hesla a přidávání/odebírání položek faktury s přepočtem částek.
