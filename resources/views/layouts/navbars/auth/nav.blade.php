@@ -1,7 +1,7 @@
 @php
-  $sectionLabels = ['dashboard'=>'Moje práce','projects'=>'Projekty','tasks'=>'Úkoly','clients'=>'Klienti','invoices'=>'Faktury','support-plans'=>'Služby a období','passwords'=>'Přístupy','notifications'=>'Oznámení','user-management'=>'Lidé a přístupy','users'=>'Lidé a přístupy','user-profile'=>'Můj profil'];
+  $sectionLabels = ['dashboard'=>'Nástěnka','my-work'=>'Moje práce','projects'=>'Projekty','tasks'=>'Úkoly','clients'=>'Klienti','invoices'=>'Faktury','support-plans'=>'Služby a období','passwords'=>'Přístupy','notifications'=>'Oznámení','user-management'=>'Lidé a přístupy','users'=>'Lidé a přístupy','user-profile'=>'Můj profil'];
   $sectionLabel = $sectionLabels[request()->segment(1)] ?? 'Pracovní prostor';
-  $sectionIcon = ['dashboard'=>'home','projects'=>'folder','tasks'=>'tasks','clients'=>'clients','support-plans'=>'calendar','invoices'=>'invoice','passwords'=>'key','notifications'=>'bell','user-management'=>'people','users'=>'people'][request()->segment(1)] ?? 'home';
+  $sectionIcon = ['dashboard'=>'home','my-work'=>'tasks','projects'=>'folder','tasks'=>'tasks','clients'=>'clients','support-plans'=>'calendar','invoices'=>'invoice','passwords'=>'key','notifications'=>'bell','user-management'=>'people','users'=>'people'][request()->segment(1)] ?? 'home';
   $notificationCount = auth()->user()->unreadNotifications()->count();
 @endphp
 <header class="workspace-topbar">

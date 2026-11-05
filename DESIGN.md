@@ -62,3 +62,28 @@ Dále filtry s návratem zpět, nabídky klávesnicí, dlouhé názvy, dva koleg
 na úkolu, zachování zrušeného výběru po chybě a kurzor v otevřeném editoru.
 Pracovní scénáře pokryly také poznámky, časovače dvou lidí, ruční čas, faktury
 a navazující období služby. Finální snímky byly prohlédnuty na desktopu i mobilu.
+
+## Obnovená nástěnka a podbarvené sekce
+
+Uživatel chce zpět původní nástěnku a výraznější rozdělení sekcí podkladem,
+včetně oddělení filtrů a tabulek ve všech seznamových výpisech. Nástěnka
+se vrátí na /dashboard: souhrny, měsíční příjmy, stavy úkolů, faktury a služby.
+Moje práce zůstává samostatně na /my-work. Finanční část počítá vždy jednu
+z viditelných měn faktur; cenové součty služeb zůstávají oddělené po měnách.
+
+Paleta sekcí: neutrální #F6F6F9 pro filtry, jemná fialová #F2F0FB pro práci,
+zelená #EEF6F1 pro služby a teplá #FAF5E9 pro domluvy. V tmavém režimu
+mají vlastní tmavé protějšky; text a ovládání zachovávají kontrast. Písmo,
+rozměry ovládání a akce zůstávají ze současného návrhu.
+
+Přezkoumání: podbarvení patří celému funkčnímu bloku, ne každému prvku.
+Filtry mají jednotný podklad a tabulka vlastní bílou/tmavou plochu. Nové
+panely bez dekorativních stínů obnovují požadovanou hierarchii a zachovávají
+kompaktní řádky i plovoucí nabídky akcí.
+
+Ověření této úpravy: 27 Laravel testů / 172 kontrol, sestavení produkčních
+souborů a kompilace Blade. Prohlížeč ověřil všech sedm seznamů v obou
+motivech, filtry nástěnky, přechod na neuhrazené faktury a nabídky akcí bez
+změny výšky řádku. Nástěnka, Moje práce, seznamy a hlavní detaily nemají
+vodorovné přetékání při 320, 390, 768 a 1024 px. Vizuální kontrola zahrnuje
+desktop i mobil.

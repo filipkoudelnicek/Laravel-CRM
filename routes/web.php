@@ -26,6 +26,7 @@ Route::group(['middleware' => ['auth', \App\Http\Middleware\ShareActiveTimer::cl
 
     Route::get('/', [HomeController::class, 'home']);
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('my-work', [DashboardController::class, 'work'])->name('work.index');
     Route::get('user-management',        [UserController::class, 'index'])->name('user-management');
     Route::get('users/create',             [UserController::class, 'create'])->name('users.create');
     Route::post('users',                   [UserController::class, 'store'])->name('users.store');
