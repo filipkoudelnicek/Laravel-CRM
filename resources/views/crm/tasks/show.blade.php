@@ -9,7 +9,7 @@
 <div class="mobile-task-meta"><span class="status-chip" data-status="{{ $task->status }}">{{ $statusLabels[$task->status] }}</span><span>{{ $task->due_at ? 'Termín '.$task->due_at->format('j. n. Y') : 'Bez termínu' }}</span></div>
 <div class="task-detail-grid">
   <div class="task-document">
-    <section class="document-section" aria-label="Zadání úkolu">
+    <section class="document-section task-brief" aria-label="Zadání úkolu">
       <header class="section-heading"><h2>Zadání</h2>@can('update',$task)<a href="{{ route('tasks.edit',$task) }}">Upravit zadání</a>@endcan</header>
       @if($task->description)<div class="rich-content">{!! $task->description !!}</div>@else<p class="document-placeholder">Zadání zatím není vyplněné.</p>@endif
       @if($task->attachments->isNotEmpty())
@@ -21,14 +21,7 @@
       @endif
     </section>
     <section class="document-section" aria-label="Komentáře k úkolu">
-      <header class="section-heading"><h2>Komentáře <span class="text-secondary">{{ $commentCount }}</span></h2><a href="#comment-form">Napsat komentář</a></header>
-      <div class="comment-list">
-        @forelse($task->comments as $comment)
-          @include('crm.tasks._comment',['comment'=>$comment,'depth'=>0])
-        @empty
-          <p class="document-placeholder">Zatím tu nejsou žádné komentáře.</p>
-        @endforelse
-      </div>
+      <header class="section-heading"><h2>Komentáře <span class="text-secondary">{{ $commentCount }}</span></h2></header>
       <form id="comment-form" class="comment-composer" method="POST" action="{{ route('tasks.comments.store',$task) }}" enctype="multipart/form-data">
         @csrf
         <textarea name="body" rows="3" class="form-control rich-editor-source" aria-label="Nový komentář" placeholder="Napište komentář nebo domluvu s kolegou…" required>{{ old('body') }}</textarea>
@@ -36,6 +29,13 @@
         <details class="attachment-picker"><summary>Přidat přílohy</summary><input type="file" name="attachments[]" aria-label="Přílohy komentáře" class="form-control" multiple accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip"></details>
         <div class="composer-actions"><small>Pro zmínku napište @jméno.</small><button class="btn btn-primary">Přidat komentář</button></div>
       </form>
+      <div class="comment-list">
+        @forelse($task->comments as $comment)
+          @include('crm.tasks._comment',['comment'=>$comment,'depth'=>0])
+        @empty
+          <p class="document-placeholder">Zatím tu nejsou žádné komentáře.</p>
+        @endforelse
+      </div>
     </section>
   </div>
   <aside class="task-properties" aria-label="Podrobnosti a čas úkolu">

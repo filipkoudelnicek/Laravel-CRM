@@ -155,3 +155,9 @@
 
 .project-notes-document{max-width:860px}.project-note-composer{padding-bottom:24px;border-bottom:1px solid var(--line);margin-bottom:6px}.project-note-item{display:flex;gap:14px;padding:24px 0;border-bottom:1px solid var(--line)}.project-note-content{min-width:0;flex:1}.project-note-content .note-body{font-size:14px;line-height:1.9}.project-note-stream{margin-bottom:20px}.workspace .rich-content p{font-size:15px;line-height:1.85}.workspace .comment-item .rich-content p{font-size:14px;line-height:1.85}.workspace .ck-content p{font-size:14px;line-height:1.7}.comment-list{margin-bottom:24px}.comment-item:last-child{border-bottom:0}.comment-header .row-actions{position:relative}
 @media(max-width:575px){.project-note-item{gap:10px;padding:20px 0}.project-note-item>.person-avatar{width:26px;height:26px}.project-note-content .note-body{font-size:13px}.project-note-content .comment-header time{font-size:10px}.workspace .comment-item .rich-content p{font-size:14px}}
+
+/* The brief is a stable document area, distinct from the discussion below. */
+.task-brief{min-height:220px;padding:22px;background:var(--subtle);border:1px solid var(--line);border-radius:10px;margin-bottom:34px}
+.task-brief>.section-heading{padding-bottom:14px;margin-bottom:18px}
+.task-brief .document-placeholder{margin:0}
+@media(max-width:575px){.task-brief{min-height:180px;padding:18px;margin-bottom:28px}}
